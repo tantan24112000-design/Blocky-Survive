@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>PixelSurvive - Enhanced</title>
+</head>
+<body>
+<div id="wrap">
+<canvas id="c"></canvas>
+<div id="tip"></div>
+<div id="hints">
+  A/D · Di chuyển<br>W · Space · Nhảy<br>
+  Click trái ▶ Đào / Đánh<br>Click phải ◀ Đặt / Ăn<br>
+  E · Chế tạo<br>F · Lò nung<br>1–9 · Chọn ô<br>ESC · Tạm dừng
+</div>
+<div id="menu-overlay">
+  <div id="menu-bg"><canvas id="menubg"></canvas></div>
+  <div id="menu-content">
+    <div class="menu-title">PIXEL SURVIVE</div>
+    <div class="menu-sub">Phiên bản 2.0 - Enhanced</div>
+    <div class="menu-splash" id="splash-text">Cày cuốc làm giàu!</div>
+    <button class="mbtn" id="btn-play">Choi Don</button>
+    <button class="mbtn" id="btn-online">Choi Mang</button>
+    <button class="mbtn" id="btn-skin">Tuy Chinh Nhan Vat</button>
+    <button class="mbtn" id="btn-settings">Cai Dat</button>
+    <button class="mbtn" id="btn-credits">Tin Dung</button>
+    <div class="menu-ver">PixelSurvive v2.0 Enhanced · 2025</div>
+  </div>
+</div>
+<div id="world-screen">
+  <h2>Chọn Thế Giới</h2>
+  <div class="world-list" id="world-list"></div>
+  <div class="back-row">
+    <button class="mbtn" id="btn-create-world">Tạo Thế Giới Mới</button>
+    <button class="mbtn" id="btn-back-world">Quay Lại</button>
+  </div>
+</div>
+<div id="settings-screen">
+  <h2>Cài Đặt</h2>
+  <div class="setting-row" style="max-width:400px;width:100%;"><label>Ten nguoi choi</label><input type="text" id="player-name-input" maxlength="16" placeholder="Nhap ten..." style="background:#0c0c1c;border:1px solid #3a3a5a;color:#fff;padding:4px 8px;font-family:'Courier New';font-size:12px;width:140px;"></div>
+  <div class="setting-row"><label>Am luong</label><input type="range" id="vol-slider" min="0" max="100" value="60"><span id="vol-val">60</span></div>
+  <div class="setting-row"><label>Tốc độ ngày</label><input type="range" id="day-slider" min="1" max="10" value="3"><span id="day-val">3</span></div>
+  <button class="mbtn" id="btn-back-settings" style="margin-top:18px;">Xong</button>
+</div>
+<div id="credits-screen">
+  <h2>Tín Dụng</h2>
+  <p>PixelSurvive v2.0 Enhanced<br>Trò chơi sinh tồn pixel 2D<br>Phát triển bởi: PixelStudio<br>Engine: Canvas 2D thuần<br>Cảm hứng: Minecraft & Terraria<br>2025</p>
+  <button class="mbtn" id="btn-back-credits" style="margin-top:18px;">Quay Lại</button>
+</div>
+<div id="skin-screen">
+  <h2>Tùy Chỉnh Nhân Vật</h2>
+  <div style="display:flex;gap:32px;align-items:flex-start;justify-content:center;flex-wrap:wrap;">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+      <canvas id="skin-preview-c" width="80" height="150" style="background:rgba(20,20,40,0.8);border:2px solid #3a3a5a;image-rendering:pixelated;transform:scale(1.5);transform-origin:top center;margin-bottom:30px;"></canvas>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:0;">
+      <div class="skin-row"><label>Màu da</label><div class="swatches" id="sw-face"></div></div>
+      <div class="skin-row"><label>Tóc</label><div class="swatches" id="sw-hair"></div></div>
+      <div class="skin-row"><label>Mắt</label><div class="swatches" id="sw-eye"></div></div>
+      <div class="skin-row"><label>Áo</label><div class="swatches" id="sw-shirt"></div></div>
+      <div class="skin-row"><label>Quần</label><div class="swatches" id="sw-pants"></div></div>
+      <div class="skin-row"><label>Giày</label><div class="swatches" id="sw-shoe"></div></div>
+    </div>
+  </div>
+  <div style="margin-top:18px;color:#6a6a8a;font-size:11px;">Skin mẫu</div>
+  <div class="preset-row" id="skin-presets"></div>
+  <div style="display:flex;gap:10px;margin-top:18px;">
+    <button class="mbtn" id="btn-save-skin">Luu Skin</button>
+    <button class="mbtn" id="btn-back-skin">Quay Lại</button>
+  </div>
+</div>
+<div id="online-screen">
+  <h2>Choi Mang</h2>
+  <div class="name-input-row">
+    <label>Ten cua ban:</label>
+    <input type="text" id="online-name-input" maxlength="16" placeholder="Nhap ten...">
+  </div>
+  <div class="online-section">
+    <h3>TAO PHONG</h3>
+    <button class="mbtn" id="btn-create-room">Tao Phong Moi</button>
+    <div class="id-display" id="room-id-box">
+      <div style="color:#aaa;font-size:11px;">ID PHONG CUA BAN — chia se cho ban be:</div>
+      <div class="id-val" id="room-id-val"></div>
+      <button class="mbtn sm" id="btn-copy-id">Sao Chep ID</button>
+      <div id="guest-list" style="margin-top:8px;font-size:11px;color:#6a6a8a;"></div>
+    </div>
+  </div>
+  <div class="online-section">
+    <h3>THAM GIA PHONG</h3>
+    <div class="join-row">
+      <input type="text" id="join-id-input" placeholder="Nhap ID phong...">
+      <button class="mbtn sm" id="btn-join-room">Ket Noi</button>
+    </div>
+  </div>
+  <div id="online-status"></div>
+  <button class="mbtn" id="btn-back-online" style="margin-top:8px;">Quay Lai</button>
+</div>
+<div id="pause-overlay">
+  <h2>Tạm Dừng</h2>
+  <button class="mbtn" id="btn-resume">Tiếp Tục</button>
+  <button class="mbtn" id="btn-save-quit">Lưu & Thoát</button>
+</div>
+<div id="furnace-overlay">
+  <div class="furnace-panel">
+    <div class="furnace-close" id="furnace-close-btn">&times;</div>
+    <div><div class="furnace-slot" id="furn-input"></div><div class="furnace-label">Nguyên liệu</div></div>
+    <div><div class="furnace-slot" id="furn-fuel"></div><div class="furnace-label">Nhiên liệu</div><div class="furnace-bar"><div class="furnace-bar-fill" id="furn-fuel-bar"></div></div></div>
+    <div class="furnace-arrow">▶</div>
+    <div><div class="furnace-slot" id="furn-output" style="border-color:#50C878;"></div><div class="furnace-label">Kết quả</div><div class="furnace-bar"><div class="furnace-bar-fill" id="furn-progress-bar" style="background:#50C878;"></div></div></div>
+  </div>
+</div>
+</div>
+</body>
+</html>
