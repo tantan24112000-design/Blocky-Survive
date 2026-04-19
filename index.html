@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <title>PixelSurvive - Enhanced</title>
+<script src="https://unpkg.com/peerjs@1.5.1/dist/peerjs.min.js"></script>
+<link rel="stylesheet" href="ui.css">
 </head>
 <body>
 <div id="wrap">
@@ -17,7 +19,7 @@
   <div id="menu-bg"><canvas id="menubg"></canvas></div>
   <div id="menu-content">
     <div class="menu-title">PIXEL SURVIVE</div>
-    <div class="menu-sub">Phiên bản 2.0 - Enhanced</div>
+    <div class="menu-sub" id="menu-sub">Phiên bản 2.0 - Enhanced</div>
     <div class="menu-splash" id="splash-text">Cày cuốc làm giàu!</div>
     <button class="mbtn" id="btn-play">Choi Don</button>
     <button class="mbtn" id="btn-online">Choi Mang</button>
@@ -27,8 +29,18 @@
     <div class="menu-ver">PixelSurvive v2.0 Enhanced · 2025</div>
   </div>
 </div>
+<div id="platform-overlay">
+  <div class="platform-panel">
+    <div class="platform-title" id="platform-title">Chọn nền tảng</div>
+    <div class="platform-sub" id="platform-sub">Chọn PC hoặc Mobile trước khi vào thế giới</div>
+    <div class="platform-row">
+      <button class="mbtn" id="btn-platform-pc">PC</button>
+      <button class="mbtn" id="btn-platform-mobile">Mobile</button>
+    </div>
+  </div>
+</div>
 <div id="world-screen">
-  <h2>Chọn Thế Giới</h2>
+  <h2 id="world-title">Chọn Thế Giới</h2>
   <div class="world-list" id="world-list"></div>
   <div class="back-row">
     <button class="mbtn" id="btn-create-world">Tạo Thế Giới Mới</button>
@@ -36,33 +48,35 @@
   </div>
 </div>
 <div id="settings-screen">
-  <h2>Cài Đặt</h2>
-  <div class="setting-row" style="max-width:400px;width:100%;"><label>Ten nguoi choi</label><input type="text" id="player-name-input" maxlength="16" placeholder="Nhap ten..." style="background:#0c0c1c;border:1px solid #3a3a5a;color:#fff;padding:4px 8px;font-family:'Courier New';font-size:12px;width:140px;"></div>
-  <div class="setting-row"><label>Am luong</label><input type="range" id="vol-slider" min="0" max="100" value="60"><span id="vol-val">60</span></div>
-  <div class="setting-row"><label>Tốc độ ngày</label><input type="range" id="day-slider" min="1" max="10" value="3"><span id="day-val">3</span></div>
+  <h2 id="settings-title">Cài Đặt</h2>
+  <div class="setting-row" style="max-width:400px;width:100%;"><label id="player-name-label">Ten nguoi choi</label><input type="text" id="player-name-input" maxlength="16" placeholder="Nhap ten..." style="background:#0c0c1c;border:1px solid #3a3a5a;color:#fff;padding:4px 8px;font-family:'Courier New';font-size:12px;width:140px;"></div>
+  <div class="setting-row"><label id="volume-label">Am luong</label><input type="range" id="vol-slider" min="0" max="100" value="60"><span id="vol-val">60</span></div>
+  <div class="setting-row"><label id="day-speed-label">Tốc độ ngày</label><input type="range" id="day-slider" min="1" max="10" value="3"><span id="day-val">3</span></div>
+  <div class="setting-row setting-mode-row"><label id="control-mode-label">Thiết bị</label><div class="mode-buttons"><button class="mbtn sm mode-btn" id="btn-control-pc">PC</button><button class="mbtn sm mode-btn" id="btn-control-mobile">Mobile</button></div></div>
+  <div class="setting-note" id="control-mode-note">Tự nhận diện khi vừa vào web. Có thể đổi tại đây.</div>
+  <div class="setting-row"><label id="lang-label">Ngôn ngữ</label><button class="mbtn sm" id="btn-lang" style="min-width:140px;">Tiếng Việt</button></div>
   <button class="mbtn" id="btn-back-settings" style="margin-top:18px;">Xong</button>
 </div>
 <div id="credits-screen">
-  <h2>Tín Dụng</h2>
-  <p>PixelSurvive v2.0 Enhanced<br>Trò chơi sinh tồn pixel 2D<br>Phát triển bởi: PixelStudio<br>Engine: Canvas 2D thuần<br>Cảm hứng: Minecraft & Terraria<br>2025</p>
+  <h2 id="credits-title">Tín Dụng</h2>
+  <p id="credits-text">PixelSurvive v2.0 Enhanced<br>Trò chơi sinh tồn pixel 2D<br>Phát triển bởi: PixelStudio<br>Engine: Canvas 2D thuần<br>Cảm hứng: Minecraft & Terraria<br>2025</p>
   <button class="mbtn" id="btn-back-credits" style="margin-top:18px;">Quay Lại</button>
 </div>
+
 <div id="skin-screen">
-  <h2>Tùy Chỉnh Nhân Vật</h2>
+  <h2 id="skin-title">Tùy Chỉnh Nhân Vật</h2>
   <div style="display:flex;gap:32px;align-items:flex-start;justify-content:center;flex-wrap:wrap;">
     <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
       <canvas id="skin-preview-c" width="80" height="150" style="background:rgba(20,20,40,0.8);border:2px solid #3a3a5a;image-rendering:pixelated;transform:scale(1.5);transform-origin:top center;margin-bottom:30px;"></canvas>
     </div>
     <div style="display:flex;flex-direction:column;gap:0;">
-      <div class="skin-row"><label>Màu da</label><div class="swatches" id="sw-face"></div></div>
-      <div class="skin-row"><label>Tóc</label><div class="swatches" id="sw-hair"></div></div>
-      <div class="skin-row"><label>Mắt</label><div class="swatches" id="sw-eye"></div></div>
-      <div class="skin-row"><label>Áo</label><div class="swatches" id="sw-shirt"></div></div>
-      <div class="skin-row"><label>Quần</label><div class="swatches" id="sw-pants"></div></div>
-      <div class="skin-row"><label>Giày</label><div class="swatches" id="sw-shoe"></div></div>
+      <div class="skin-row"><label id="skin-face-label">Màu da</label><div class="swatches" id="sw-face"></div></div>
+      <div class="skin-row"><label id="skin-shirt-label">Áo</label><div class="swatches" id="sw-shirt"></div></div>
+      <div class="skin-row"><label id="skin-pants-label">Quần</label><div class="swatches" id="sw-pants"></div></div>
+      <div class="skin-row"><label id="skin-shoe-label">Giày</label><div class="swatches" id="sw-shoe"></div></div>
     </div>
   </div>
-  <div style="margin-top:18px;color:#6a6a8a;font-size:11px;">Skin mẫu</div>
+  <div id="skin-sample-label" style="margin-top:18px;color:#6a6a8a;font-size:11px;">Skin mẫu</div>
   <div class="preset-row" id="skin-presets"></div>
   <div style="display:flex;gap:10px;margin-top:18px;">
     <button class="mbtn" id="btn-save-skin">Luu Skin</button>
@@ -70,23 +84,23 @@
   </div>
 </div>
 <div id="online-screen">
-  <h2>Choi Mang</h2>
+  <h2 id="online-title">Choi Mang</h2>
   <div class="name-input-row">
-    <label>Ten cua ban:</label>
+    <label id="online-name-label">Ten cua ban:</label>
     <input type="text" id="online-name-input" maxlength="16" placeholder="Nhap ten...">
   </div>
   <div class="online-section">
-    <h3>TAO PHONG</h3>
+    <h3 id="create-room-title">TAO PHONG</h3>
     <button class="mbtn" id="btn-create-room">Tao Phong Moi</button>
     <div class="id-display" id="room-id-box">
-      <div style="color:#aaa;font-size:11px;">ID PHONG CUA BAN — chia se cho ban be:</div>
+      <div style="color:#aaa;font-size:11px;"><span id="room-share-text">ID PHONG CUA BAN — chia se cho ban be:</span></div>
       <div class="id-val" id="room-id-val"></div>
       <button class="mbtn sm" id="btn-copy-id">Sao Chep ID</button>
       <div id="guest-list" style="margin-top:8px;font-size:11px;color:#6a6a8a;"></div>
     </div>
   </div>
   <div class="online-section">
-    <h3>THAM GIA PHONG</h3>
+    <h3 id="join-room-title">THAM GIA PHONG</h3>
     <div class="join-row">
       <input type="text" id="join-id-input" placeholder="Nhap ID phong...">
       <button class="mbtn sm" id="btn-join-room">Ket Noi</button>
@@ -96,19 +110,35 @@
   <button class="mbtn" id="btn-back-online" style="margin-top:8px;">Quay Lai</button>
 </div>
 <div id="pause-overlay">
-  <h2>Tạm Dừng</h2>
+  <h2 id="pause-title">Tạm Dừng</h2>
   <button class="mbtn" id="btn-resume">Tiếp Tục</button>
   <button class="mbtn" id="btn-save-quit">Lưu & Thoát</button>
 </div>
 <div id="furnace-overlay">
   <div class="furnace-panel">
     <div class="furnace-close" id="furnace-close-btn">&times;</div>
-    <div><div class="furnace-slot" id="furn-input"></div><div class="furnace-label">Nguyên liệu</div></div>
-    <div><div class="furnace-slot" id="furn-fuel"></div><div class="furnace-label">Nhiên liệu</div><div class="furnace-bar"><div class="furnace-bar-fill" id="furn-fuel-bar"></div></div></div>
+    <div><div class="furnace-slot" id="furn-input"></div><div class="furnace-label" id="furn-input-label">Nguyên liệu</div></div>
+    <div><div class="furnace-slot" id="furn-fuel"></div><div class="furnace-label" id="furn-fuel-label">Nhiên liệu</div><div class="furnace-bar"><div class="furnace-bar-fill" id="furn-fuel-bar"></div></div></div>
     <div class="furnace-arrow">▶</div>
-    <div><div class="furnace-slot" id="furn-output" style="border-color:#50C878;"></div><div class="furnace-label">Kết quả</div><div class="furnace-bar"><div class="furnace-bar-fill" id="furn-progress-bar" style="background:#50C878;"></div></div></div>
+    <div><div class="furnace-slot" id="furn-output" style="border-color:#50C878;"></div><div class="furnace-label" id="furn-output-label">Kết quả</div><div class="furnace-bar"><div class="furnace-bar-fill" id="furn-progress-bar" style="background:#50C878;"></div></div></div>
   </div>
 </div>
 </div>
+<div id="mobile-controls">
+  <div class="mc-left-slot">
+    <button class="mc-jump-btn" id="btn-mobile-jump-left" aria-label="Nhảy">JUMP</button>
+  </div>
+  <div class="mc-right-slot">
+    <div id="mobile-joystick" class="mc-joystick" aria-label="Điều khiển di chuyển">
+      <div class="mc-joy-base"></div>
+      <div class="mc-joy-thumb" id="mc-joy-thumb"></div>
+    </div>
+  </div>
+</div>
+
+<script src="main-01-init.js"></script>
+<script src="main-02-world.js"></script>
+<script src="main-03-render.js"></script>
+<script src="main-04-ui.js"></script>
 </body>
 </html>
