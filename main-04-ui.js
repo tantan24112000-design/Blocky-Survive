@@ -125,7 +125,7 @@ function refreshControlModeButtons(){
   if(mobileBtn) mobileBtn.classList.toggle('active', controlMode==='mobile');
   const note=document.getElementById('control-mode-note');
   if(note){
-    note.textContent = t('deviceNote') + ' ' + (lang==='en' ? 'Current mode: ' : 'Chế độ hiện tại: ') + (controlMode==='mobile' ? 'Mobile' : 'PC');
+    note.textContent = t('deviceNote') + ' Current mode: ' + (controlMode==='mobile' ? 'Mobile' : 'PC');
   }
 }
 
@@ -136,11 +136,28 @@ let guestConns = [];   // host side: all guest connections
 let hostConn  = null;  // guest side: connection to host
 let remotePlayersState = {}; // peerID -> state object
 let lastSyncTime = 0;
+const guestNames = {}; // peerID -> player name (host-side)
 const SYNC_INTERVAL = 50; // ms
 
 function setOnlineStatus(msg, cls){
   const el = document.getElementById('online-status');
   if(el){ el.textContent = msg; el.className = cls || 'online-info'; }
+}
+
+function notifyChat(text, kind='system', name=''){
+  if(typeof pushChatMessage === 'function') pushChatMessage(text, kind, name);
+}
+function broadcastSystem(text, kind='system'){
+  if(typeof pushChatMessage === 'function') pushChatMessage(text, kind, '');
+  if(onlineMode === 'host') broadcastToAll({type:'system', text, kind});
+}
+
+function sendChatMessage(text, name){
+  const msg = String(text || '').trim();
+  if(!msg) return;
+  const sender = (name || playerName || 'Player').trim() || 'Player';
+  if(typeof pushChatMessage === 'function') pushChatMessage(msg, 'chat', sender);
+  if(onlineMode) broadcastToAll({type:'chat', text:msg, name:sender});
 }
 
 function broadcastToAll(data){
@@ -156,25 +173,49 @@ function handleRemoteMsg(raw, fromId){
   let data;
   try{ data = typeof raw === 'string' ? JSON.parse(raw) : raw; }catch(e){ return; }
   if(data.type === 'init'){
-    // Guest receives world from host
     for(let i=0;i<data.world.length;i++) world[i]=data.world[i];
     for(let x=0;x<WW;x++) for(let y=0;y<WH;y++) if(solid(x,y)){heightMap[x]=y;break;}
+    if(data.mode) worldMode = data.mode;
+    if(data.seed) worldSeed = data.seed;
     player.x=data.px; player.y=data.py; player.vy=0;
     cam.x=player.x-W/2; cam.y=player.y-H/2;
-    setOnlineStatus('Da ket noi! Chuc vui!','online-ok');
+    setOnlineStatus('Connected! Have fun!','online-ok');
   } else if(data.type === 'state'){
     remotePlayersState[fromId] = data;
   } else if(data.type === 'block'){
     setB(data.x, data.y, data.t);
-    // Re-broadcast from host to other guests
     if(onlineMode === 'host'){
       guestConns.forEach(c => { if(c.peer!==fromId) try{c.send(JSON.stringify(data));}catch(e){} });
     }
   } else if(data.type === 'leave'){
     delete remotePlayersState[fromId];
+    const nm = guestNames[fromId] || data.name || 'Player';
+    delete guestNames[fromId];
+    notifyChat(nm + ' left the game.', 'leave', nm);
+  } else if(data.type === 'join'){
+    guestNames[fromId] = data.name || 'Player';
+    const nm = guestNames[fromId];
+    if(onlineMode === 'host'){
+      broadcastSystem(nm + ' joined the game.', 'join');
+    } else {
+      notifyChat(nm + ' joined the game.', 'join', nm);
+    }
+  } else if(data.type === 'chat'){
+    const nm = data.name || guestNames[fromId] || 'Player';
+    notifyChat(data.text, 'chat', nm);
+    if(onlineMode === 'host'){
+      guestConns.forEach(c => { if(c.peer!==fromId) try{c.send(JSON.stringify(data));}catch(e){} });
+    }
+  } else if(data.type === 'system'){
+    notifyChat(data.text, data.kind || 'system', data.name || '');
+  } else if(data.type === 'death'){
+    const nm = data.name || guestNames[fromId] || 'Player';
+    notifyChat(nm + ' died.', 'death', nm);
+    if(onlineMode === 'host'){
+      guestConns.forEach(c => { if(c.peer!==fromId) try{c.send(JSON.stringify(data));}catch(e){} });
+    }
   }
 }
-
 function sendState(){
   if(!onlineMode) return;
   const now = performance.now();
@@ -184,7 +225,7 @@ function sendState(){
     type:'state', x:player.x, y:player.y, facing:player.facing,
     walkCycle:walkCycle, walkAmp:walkAmp, health:player.health,
     held:inv[hotIdx]?inv[hotIdx].key:null,
-    name:playerName, skin:skinData
+    name:playerName, skin:skinData, dead:player.isDead
   };
   broadcastToAll(state);
 }
@@ -193,7 +234,7 @@ function updateGuestList(){
   const el = document.getElementById('guest-list');
   if(!el) return;
   const n = guestConns.length;
-  el.textContent = n > 0 ? n + ' nguoi choi da tham gia' : 'Dang cho...';
+  el.textContent = n > 0 ? n + ' player' + (n===1?'':'s') + ' online' : 'Waiting...';
 }
 
 function initPeer(onReady){
@@ -201,17 +242,17 @@ function initPeer(onReady){
   peer = new Peer();
   peer.on('open', id => { onReady && onReady(id); });
   peer.on('error', err => {
-    setOnlineStatus('Loi: ' + err.type, 'online-err');
+    setOnlineStatus('Error: ' + err.type, 'online-err');
   });
 }
 
 function createRoom(){
-  setOnlineStatus('Dang khoi tao...','online-info');
+  setOnlineStatus('Creating room...','online-info');
   initPeer(id => {
     onlineMode = 'host';
     document.getElementById('room-id-val').textContent = id;
     document.getElementById('room-id-box').style.display = 'block';
-    setOnlineStatus('Phong da tao. Chia se ID cho ban be!','online-ok');
+    setOnlineStatus('Room created. Share the ID with friends!','online-ok');
     // Listen for guests
     peer.on('connection', conn => {
       conn.on('open', () => {
@@ -223,14 +264,19 @@ function createRoom(){
           world: Array.from(world),
           px: spawnBX*BS-13,
           py: spawnBY*BS,
+          mode: worldMode,
+          seed: worldSeed
         });
         conn.send(initMsg);
       });
       conn.on('data', raw => handleRemoteMsg(raw, conn.peer));
       conn.on('close', () => {
         guestConns = guestConns.filter(c => c !== conn);
+        const nm = guestNames[conn.peer] || 'Player';
+        delete guestNames[conn.peer];
         delete remotePlayersState[conn.peer];
         updateGuestList();
+        broadcastSystem(nm + ' left the game.', 'leave');
       });
     });
     // Start game as host
@@ -239,18 +285,21 @@ function createRoom(){
 }
 
 function joinRoom(hostId){
-  if(!hostId){ setOnlineStatus('Hay nhap ID phong!','online-err'); return; }
-  setOnlineStatus('Dang ket noi...','online-info');
+  if(!hostId){ setOnlineStatus('Enter a room ID!','online-err'); return; }
+  setOnlineStatus('Connecting...','online-info');
   initPeer(() => {
     onlineMode = 'guest';
     hostConn = peer.connect(hostId.trim());
     hostConn.on('open', () => {
-      setOnlineStatus('Da ket noi! Dang tai the gioi...','online-ok');
+      setOnlineStatus('Connected! Loading world...','online-ok');
+      try{ hostConn.send(JSON.stringify({type:'join', name:playerName})); }catch(e){}
     });
     hostConn.on('data', raw => handleRemoteMsg(raw, hostConn.peer));
     hostConn.on('close', () => {
-      setOnlineStatus('Mat ket noi!','online-err');
+      setOnlineStatus('Disconnected!','online-err');
+      notifyChat('Host left the game.', 'leave', 'Host');
       onlineMode = null;
+      hostConn = null;
     });
     // Start game (world comes via 'init' message)
     startOnlineGame();
@@ -259,8 +308,11 @@ function joinRoom(hostId){
 
 function startOnlineGame(){
   document.getElementById('online-screen').style.display = 'none';
+  setChatOpen(false);
+  if(typeof chatMessages!=='undefined'){chatMessages.length=0;renderChatLog();}
   inv.fill(null); drops.length=0; particles.length=0;
   entities.length=0; remotePlayersState={};
+  setChatOpen(false);
   if(onlineMode === 'host'){
     generateWorld(); initPlayerSpawn();
     player.health=player.maxHealth; player.hunger=player.maxHunger;
@@ -322,9 +374,14 @@ function drawRemotePlayers(){
   }
 }
 
+function openCreateWorldModal(slot){pendingWorldCreateSlot=slot;pendingWorldMode='survival';pendingWorldSeed='';const modal=document.getElementById('create-world-modal');if(!modal)return;const seedInput=document.getElementById('world-seed-input');if(seedInput){seedInput.value='';seedInput.placeholder='Seed tu do...';seedInput.focus();}setCreateMode('survival');modal.style.display='flex';}
+function closeCreateWorldModal(){const modal=document.getElementById('create-world-modal');if(modal)modal.style.display='none';pendingWorldCreateSlot=-1;}
+function setCreateMode(mode){pendingWorldMode=mode==='creative'?'creative':'survival';const sBtn=document.getElementById('btn-mode-survival');const cBtn=document.getElementById('btn-mode-creative');if(sBtn)sBtn.classList.toggle('active',pendingWorldMode==='survival');if(cBtn)cBtn.classList.toggle('active',pendingWorldMode==='creative');}
+function confirmCreateWorld(){const seedInput=document.getElementById('world-seed-input');const seed=(seedInput&&seedInput.value?seedInput.value.trim():'')||('seed-'+Date.now().toString(36));pendingWorldSeed=seed;const slot=pendingWorldCreateSlot<0?0:pendingWorldCreateSlot;closeCreateWorldModal();createAndStart(slot,{seed:seed,mode:pendingWorldMode});}
 function showOnlineScreen(){
   document.getElementById('menu-overlay').style.display='none';
   document.getElementById('online-screen').style.display='flex';
+  setChatOpen(false);
   const ni=document.getElementById('online-name-input');
   if(ni) ni.value=playerName;
   setOnlineStatus('','');
@@ -333,8 +390,8 @@ function hideOnlineScreen(){
   document.getElementById('online-screen').style.display='none';
   document.getElementById('menu-overlay').style.display='flex';
 }
-function showMainMenu(){platformChooserOpen=false;document.getElementById('menu-overlay').style.display='flex';document.getElementById('world-screen').style.display='none';document.getElementById('settings-screen').style.display='none';document.getElementById('credits-screen').style.display='none';document.getElementById('skin-screen').style.display='none';document.getElementById('online-screen').style.display='none';document.getElementById('pause-overlay').style.display='none';syncControlUI();}
-function showWorldScreen(){document.getElementById('menu-overlay').style.display='none';const list=document.getElementById('world-list');list.innerHTML='';for(let i=0;i<MAX_SLOTS;i++){const has=hasSave(i);const info=getSaveInfo(i);const slot=document.createElement('div');slot.className='world-slot';const name=has?('Thế Giới '+(i+1)):('Ô Trống '+(i+1));const dateStr=info?new Date(info.time).toLocaleString('vi-VN'):'Chưa tạo';let delBtn='';if(has){delBtn='<div class="wdel" data-slot="'+i+'">Xóa</div>';}slot.innerHTML='<div><div class="wname">'+name+'</div><div class="winfo">'+dateStr+'</div></div>'+delBtn;slot.dataset.slot=i;slot.addEventListener('click',function(ev){if(ev.target.classList.contains('wdel')){ev.stopPropagation();const s=parseInt(ev.target.dataset.slot);if(confirm('Xóa thế giới này?')){deleteWorldSlot(s);showWorldScreen();}return;}const s=parseInt(this.dataset.slot);if(hasSave(s)){startGame(s);}else{createAndStart(s);}});list.appendChild(slot);}document.getElementById('world-screen').style.display='flex';}
+function showMainMenu(){platformChooserOpen=false;document.getElementById('menu-overlay').style.display='flex';document.getElementById('world-screen').style.display='none';document.getElementById('settings-screen').style.display='none';document.getElementById('credits-screen').style.display='none';document.getElementById('skin-screen').style.display='none';document.getElementById('online-screen').style.display='none';document.getElementById('pause-overlay').style.display='none';setChatOpen(false);closeCreateWorldModal();syncControlUI();}
+function showWorldScreen(){document.getElementById('menu-overlay').style.display='none';const list=document.getElementById('world-list');list.innerHTML='';for(let i=0;i<MAX_SLOTS;i++){const has=hasSave(i);const info=getSaveInfo(i);const slot=document.createElement('div');slot.className='world-slot';const name=has?('World '+(i+1)):('Empty Slot '+(i+1));const dateStr=info?new Date(info.time).toLocaleString('en-US'):'Not created';const modeStr=info?(' · '+(info.mode==='creative'?'Creation':'Survival')):'';const seedStr=info&&info.seed?(' · Seed: '+info.seed):'';let delBtn='';if(has){delBtn='<div class="wdel" data-slot="'+i+'">Delete</div>';}slot.innerHTML='<div><div class="wname">'+name+'</div><div class="winfo">'+dateStr+modeStr+seedStr+'</div></div>'+delBtn;slot.dataset.slot=i;slot.addEventListener('click',function(ev){if(ev.target.classList.contains('wdel')){ev.stopPropagation();const s=parseInt(ev.target.dataset.slot);if(confirm('Delete this world?')){deleteWorldSlot(s);showWorldScreen();}return;}const s=parseInt(this.dataset.slot);if(hasSave(s)){startGame(s);}else{openCreateWorldModal(s);}});list.appendChild(slot);}document.getElementById('world-screen').style.display='flex';}
 function hideWorldScreen(){document.getElementById('world-screen').style.display='none';document.getElementById('menu-overlay').style.display='flex';syncControlUI();}
 function showSettings(){document.getElementById('menu-overlay').style.display='none';document.getElementById('vol-slider').value=Math.round(masterVol*100);document.getElementById('vol-val').textContent=Math.round(masterVol*100);document.getElementById('day-slider').value=daySpeed;document.getElementById('day-val').textContent=daySpeed;const _si=document.getElementById('player-name-input');if(_si)_si.value=playerName;document.getElementById('settings-screen').style.display='flex';refreshControlModeButtons();}
 function hideSettings(){masterVol=parseInt(document.getElementById('vol-slider').value)/100;daySpeed=parseInt(document.getElementById('day-slider').value);document.getElementById('vol-val').textContent=Math.round(masterVol*100);document.getElementById('day-val').textContent=daySpeed;saveSettings();document.getElementById('settings-screen').style.display='none';document.getElementById('menu-overlay').style.display='flex';}
@@ -342,8 +399,8 @@ function loadSettings(){try{const s=JSON.parse(localStorage.getItem('ps_settings
 function showCredits(){document.getElementById('menu-overlay').style.display='none';document.getElementById('credits-screen').style.display='flex';}
 function hideCredits(){document.getElementById('credits-screen').style.display='none';document.getElementById('menu-overlay').style.display='flex';}
 
-function startGame(slot){currentSlot=slot;inv.fill(null);entities.length=0;drops.length=0;particles.length=0;craftGrid.fill(null);cursorItem=null;craftOpen=false;craftOutput=null;furnaceOpen=false;furnData.input=null;furnData.fuel=null;furnData.output=null;lmbDown=false;mineT=0;mineTarget=null;hungerTickTimer=3000+Math.random()*2000;document.getElementById('furnace-overlay').style.display='none';if(hasSave(slot)){loadWorld(slot);}else{generateWorld();initPlayerSpawn();player.health=player.maxHealth;player.hunger=player.maxHunger;player.isDead=false;dayT=0.35;addItem('WOOD_PICK',1);addItem('TORCH',8);addItem('BREAD',3);}document.getElementById('menu-overlay').style.display='none';document.getElementById('world-screen').style.display='none';document.getElementById('settings-screen').style.display='none';document.getElementById('credits-screen').style.display='none';document.getElementById('skin-screen').style.display='none';document.getElementById('online-screen').style.display='none';document.getElementById('pause-overlay').style.display='none';gameState='playing';syncControlUI();}
-function createAndStart(slot){currentSlot=slot;generateWorld();initPlayerSpawn();inv.fill(null);entities.length=0;drops.length=0;particles.length=0;player.health=player.maxHealth;player.hunger=player.maxHunger;player.isDead=false;dayT=0.35;addItem('WOOD_PICK',1);addItem('TORCH',8);addItem('BREAD',3);document.getElementById('menu-overlay').style.display='none';document.getElementById('world-screen').style.display='none';gameState='playing';syncControlUI();try{saveWorld(slot);}catch(e){}}
+function startGame(slot){currentSlot=slot;setChatOpen(false);if(typeof chatMessages!=='undefined'){chatMessages.length=0;renderChatLog();}chatAnnouncedDeath=false;inv.fill(null);entities.length=0;drops.length=0;particles.length=0;craftGrid.fill(null);cursorItem=null;craftOpen=false;craftOutput=null;furnaceOpen=false;furnData.input=null;furnData.fuel=null;furnData.output=null;lmbDown=false;mineT=0;mineTarget=null;hungerTickTimer=3000+Math.random()*2000;document.getElementById('furnace-overlay').style.display='none';if(hasSave(slot)){loadWorld(slot);}else{generateWorld(worldSeed);initPlayerSpawn();player.health=player.maxHealth;player.hunger=player.maxHunger;player.isDead=false;dayT=0.35;if(worldMode!=='creative'){addItem('WOOD_PICK',1);addItem('TORCH',8);addItem('BREAD',3);}}document.getElementById('menu-overlay').style.display='none';document.getElementById('world-screen').style.display='none';document.getElementById('settings-screen').style.display='none';document.getElementById('credits-screen').style.display='none';document.getElementById('skin-screen').style.display='none';document.getElementById('online-screen').style.display='none';document.getElementById('pause-overlay').style.display='none';gameState='playing';syncControlUI();}
+function createAndStart(slot,opts={}){currentSlot=slot;setChatOpen(false);if(typeof chatMessages!=='undefined'){chatMessages.length=0;renderChatLog();}chatAnnouncedDeath=false;worldMode=opts.mode||pendingWorldMode||'survival';worldSeed=normalizeSeedText(opts.seed||pendingWorldSeed||('seed-'+Date.now().toString(36)));generateWorld(worldSeed);initPlayerSpawn();inv.fill(null);entities.length=0;drops.length=0;particles.length=0;player.health=player.maxHealth;player.hunger=player.maxHunger;player.isDead=false;dayT=0.35;if(worldMode!=='creative'){addItem('WOOD_PICK',1);addItem('TORCH',8);addItem('BREAD',3);}document.getElementById('menu-overlay').style.display='none';document.getElementById('world-screen').style.display='none';gameState='playing';syncControlUI();try{saveWorld(slot);}catch(e){}}
 function resumeGame(){gameState='playing';document.getElementById('pause-overlay').style.display='none';syncControlUI();}
 function saveAndQuit(){if(currentSlot>=0){try{saveWorld(currentSlot);}catch(e){}}syncControlUI();}
 
@@ -357,7 +414,12 @@ document.getElementById('btn-online').addEventListener('click',function(){try{in
 document.getElementById('btn-skin').addEventListener('click',function(){showSkinScreen();});
 document.getElementById('btn-credits').addEventListener('click',function(){showCredits();});
 document.getElementById('btn-back-world').addEventListener('click',function(){hideWorldScreen();});
-document.getElementById('btn-create-world').addEventListener('click',function(){for(let i=0;i<MAX_SLOTS;i++){if(!hasSave(i)){createAndStart(i);return;}}alert(t('allSlotsFull'));});
+document.getElementById('btn-create-confirm').addEventListener('click',function(){confirmCreateWorld();});
+document.getElementById('btn-create-cancel').addEventListener('click',function(){closeCreateWorldModal();});
+document.getElementById('create-world-modal').addEventListener('click',function(ev){if(ev.target===this)closeCreateWorldModal();});
+document.getElementById('btn-mode-survival').addEventListener('click',function(){setCreateMode('survival');});
+document.getElementById('btn-mode-creative').addEventListener('click',function(){setCreateMode('creative');});
+document.getElementById('btn-create-world').addEventListener('click',function(){for(let i=0;i<MAX_SLOTS;i++){if(!hasSave(i)){openCreateWorldModal(i);return;}}alert(t('allSlotsFull'));});
 document.getElementById('btn-back-settings').addEventListener('click',function(){hideSettings();});
 const _btnLang=document.getElementById('btn-lang');if(_btnLang){_btnLang.addEventListener('click',function(){toggleLanguage();});}
 document.getElementById('btn-back-credits').addEventListener('click',function(){hideCredits();});
@@ -377,7 +439,7 @@ document.getElementById('btn-join-room').addEventListener('click',function(){
 });
 document.getElementById('btn-copy-id').addEventListener('click',function(){
   const id=document.getElementById('room-id-val').textContent;
-  navigator.clipboard.writeText(id).then(()=>{this.textContent='Da Sao Chep!';setTimeout(()=>this.textContent='Sao Chep ID',1500);});
+  navigator.clipboard.writeText(id).then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy ID',1500);});
 });
 document.getElementById('online-name-input').addEventListener('input',function(){
   playerName=this.value.trim()||'Steve';
@@ -421,7 +483,8 @@ function gameLoop(timestamp){
       if(hungerTickTimer<=0){hungerTickTimer=3000+Math.random()*2000;if(Math.random()<1/3)player.hunger=Math.max(0,player.hunger-1);}
       if(player.hunger<=0)player.health=Math.max(0,player.health-dt*0.01);
       if(player.hunger>70&&player.health<player.maxHealth)player.health=Math.min(player.maxHealth,player.health+dt*0.005);
-      if(player.health<=0){player.health=0;player.isDead=true;}}
+      if(player.health<=0){player.health=0;player.isDead=true;if(!chatAnnouncedDeath){chatAnnouncedDeath=true;notifyChat(playerName + ' died.', 'death', playerName);if(onlineMode) broadcastToAll({type:'death', name:playerName});}}
+    }
     physicsStep(dt);
     if(Math.abs(player.vx)>0.1){walkCycle+=dt*0.016;walkAmp=Math.min(1,walkAmp+dt*0.008);}else{walkAmp=Math.max(0,walkAmp-dt*0.009);}
     if(!lmbDown)mineAmp=Math.max(0,mineAmp-dt*0.005);
@@ -445,7 +508,9 @@ function gameLoop(timestamp){
     if(isEating){eatTimer+=dt;if(eatTimer>=EAT_DUR){isEating=false;eatColor=null;}}
     if(isPlacing){placeTimer+=dt;if(placeTimer>=PLACE_DUR)isPlacing=false;}
     dmgFlash=Math.max(0,dmgFlash-dt*0.003);
-    handleMining(dt);updateEntities(dt);updateFurnace(dt);updateDrops(dt);updateParticles(dt);sendState();
+    if(swordSlash.active){swordSlash.timer=Math.max(0,swordSlash.timer-dt);swordSlash.x=player.x+player.w/2;swordSlash.y=player.y+player.h/3;if(swordSlash.timer<=0)swordSlash.active=false;}
+    if(bookFlipAnim>0)bookFlipAnim=Math.max(0,bookFlipAnim-dt*0.0045);
+    handleMining(dt);updateEntities(dt);updateArrows(dt);updateFurnace(dt);updateDrops(dt);updateParticles(dt);sendState();
     for(let i=placeEffects.length-1;i>=0;i--){placeEffects[i].life-=dt/700;if(placeEffects[i].life<=0)placeEffects.splice(i,1);}
     const nowOnGround=player.onGround;
     if(!nowOnGround) airTime+=dt; 
@@ -455,7 +520,7 @@ function gameLoop(timestamp){
     wasOnGround=nowOnGround;
     updateCam();
     autoSaveTimer+=dt;if(autoSaveTimer>=AUTO_SAVE_INTERVAL){autoSaveTimer=0;if(currentSlot>=0){try{saveWorld(currentSlot);}catch(e){}}}
-    drawSky();drawWorld();drawUndergroundDark();drawEntities();drawDrops();drawRemotePlayers();drawParticles();drawPlaceEffects();drawPlayer();drawLocalName();drawMineProgress();drawBlockCursor();drawHUD();drawMinimap();
+    drawSky();drawWorld();drawUndergroundDark();drawEntities();drawArrows();drawDrops();drawRemotePlayers();drawParticles();drawPlaceEffects();drawPlayer();drawSwordSlash();drawLocalName();drawMineProgress();drawBlockCursor();drawHUD();drawMinimap();renderChatLog();
     if(bookOpen&&bookAnim<1)bookAnim=Math.min(1,bookAnim+dt*0.006);else if(!bookOpen&&bookAnim>0)bookAnim=Math.max(0,bookAnim-dt*0.008);if(bookAnim>0)drawBook();
   }else if(gameState==='paused'){drawSky();drawWorld();drawUndergroundDark();drawEntities();drawDrops();drawRemotePlayers();drawParticles();drawPlayer();drawLocalName();drawHUD();drawMinimap();}
   if(craftOpen&&gameState==='playing')drawCraftUI();if(chestOpen&&gameState==='playing')drawChestUI();

@@ -1,6 +1,7 @@
 
 *{margin:0;padding:0;box-sizing:border-box;}
-body{background:#0a0a16;font-family:'Courier New',monospace;user-select:none;overflow:hidden;margin:0;width:100vw;height:100vh;}
+html{width:100%;height:100%;height:-webkit-fill-available;}
+body{background:#0a0a16;font-family:'Courier New',monospace;user-select:none;overflow:hidden;margin:0;width:100vw;height:100vh;height:-webkit-fill-available;touch-action:none;}
 #wrap{position:fixed;top:0;left:0;transform-origin:top left;box-shadow:0 0 60px rgba(60,120,255,0.18);}
 #c{display:block;image-rendering:pixelated;image-rendering:crisp-edges;cursor:crosshair;}
 #tip{position:absolute;background:rgba(10,10,20,0.92);color:#ddd;padding:4px 10px;font-size:11px;pointer-events:none;z-index:30;display:none;border:1px solid #3a3a58;border-radius:3px;white-space:nowrap;}
@@ -39,7 +40,7 @@ body{background:#0a0a16;font-family:'Courier New',monospace;user-select:none;ove
 .setting-mode-row{align-items:center;}
 .mode-buttons{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
 .mode-btn{min-width:92px;}
-.mode-btn.active{border-color:#88aaff;background:linear-gradient(180deg,#5a5a8a 0%,#4a4a6a 50%,#3a4a5a 100%);color:#fff;box-shadow:0 0 0 2px rgba(136,170,255,0.25);} 
+.mode-btn.active{border-color:#88aaff;background:linear-gradient(180deg,#5a5a8a 0%,#4a4a6a 50%,#3a4a5a 100%);color:#fff;box-shadow:0 0 0 2px rgba(136,170,255,0.25);}
 .setting-note{max-width:400px;color:#8a8aaa;font-size:11px;line-height:1.4;margin-top:2px;text-align:center;}
 #credits-screen{display:none;position:absolute;inset:0;z-index:110;background:rgba(0,0,10,0.95);flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;}
 #credits-screen h2{color:#50C878;font-size:22px;margin-bottom:20px;}
@@ -88,7 +89,6 @@ body{background:#0a0a16;font-family:'Courier New',monospace;user-select:none;ove
 .peer-tag{display:inline-block;background:rgba(136,170,255,0.15);border:1px solid #3a3a5a;padding:2px 8px;font-size:10px;color:#88aaff;margin:2px;}
 .mbtn.sm{min-width:0;padding:6px 16px;font-size:12px;}
 
-
 .setting-row #btn-lang{min-width:140px;}
 
 #platform-overlay{display:none;position:absolute;inset:0;z-index:115;background:rgba(0,0,0,0.82);align-items:center;justify-content:center;padding:20px;}
@@ -121,4 +121,507 @@ body{background:#0a0a16;font-family:'Courier New',monospace;user-select:none;ove
   .mc-joystick{width:156px;height:156px;}
   .mc-joy-thumb{width:66px;height:66px;}
   .mc-jump-btn{min-width:110px;min-height:110px;}
+}
+
+.create-world-modal{position:absolute;inset:0;z-index:120;background:rgba(0,0,0,0.84);display:flex;align-items:center;justify-content:center;padding:20px;}
+.create-world-panel{width:min(520px,100%);background:#121226;border:2px solid #445;box-shadow:0 0 30px rgba(80,200,120,.12);padding:20px 22px;border-radius:10px;display:flex;flex-direction:column;gap:14px;}
+.create-world-title{font-size:20px;color:#50C878;font-weight:bold;letter-spacing:1px;}
+.create-world-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.create-world-row label{color:#bbb;font-size:13px;min-width:70px;}
+.create-world-row input{flex:1;min-width:180px;background:#0c0c1c;border:1px solid #3a3a5a;color:#fff;padding:8px 10px;font-family:'Courier New',monospace;font-size:13px;}
+.create-world-row input:focus{outline:none;border-color:#88aaff;}
+.create-world-mode-row .mode-buttons{justify-content:flex-start;flex:1;}
+.create-world-actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;}
+
+/* ── MINECRAFT CHAT ─────────────────────────────────────────────────── */
+#chat-overlay{
+  position:absolute;left:2px;bottom:68px;z-index:85;
+  width:min(440px,calc(100vw - 8px));
+  pointer-events:none;
+  display:flex;flex-direction:column;gap:0;
+  image-rendering:pixelated;
+}
+#chat-log{
+  display:flex;flex-direction:column;gap:0;
+  max-height:220px;overflow:hidden;
+  padding:2px 0;
+}
+.chat-line{
+  font-family:'Press Start 2P','Courier New',monospace;
+  font-size:7.5px;
+  line-height:1.7;
+  padding:3px 6px 2px 6px;
+  background:rgba(0,0,0,0.52);
+  color:#ffffff;
+  text-shadow:1px 1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000;
+  word-break:break-word;
+  white-space:pre-wrap;
+  display:block;
+  border-left:2px solid transparent;
+  transition:opacity 1s ease;
+  margin-bottom:1px;
+}
+.chat-line .chat-name{font-weight:bold;color:#ffffff;}
+.chat-line.chat{border-left-color:#aaaaaa;color:#ffffff;}
+.chat-line.system{border-left-color:#aaaaff;color:#aaaaff;background:rgba(0,0,0,0.55);}
+.chat-line.join{border-left-color:#55ff55;color:#55ff55;background:rgba(0,0,0,0.55);}
+.chat-line.leave{border-left-color:#ffaa00;color:#ffaa00;background:rgba(0,0,0,0.55);}
+.chat-line.death{border-left-color:#ff5555;color:#ff5555;background:rgba(0,0,0,0.60);}
+#chat-input-wrap{
+  display:flex;align-items:center;gap:6px;
+  background:rgba(0,0,0,0.72);
+  border:2px solid #555577;
+  border-radius:0;
+  padding:5px 8px 4px 8px;
+  pointer-events:auto;
+  box-shadow:2px 2px 0 #000;
+}
+.chat-prefix{color:#aaaaff;font-family:'Press Start 2P','Courier New',monospace;font-size:8px;}
+#chat-input{
+  flex:1;background:transparent;border:none;outline:none;
+  color:#ffffff;
+  font-family:'Press Start 2P','Courier New',monospace;
+  font-size:8px;
+  text-shadow:1px 1px 0 #000;
+  caret-color:#ffffff;
+}
+#chat-input::placeholder{color:#888899;font-size:7px;}
+
+/* ══════════════════════════════════════════════════════════════════
+   MOD STUDIO  —  Roblox Studio look + Minecraft (Press Start 2P) font
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── MENU BUTTON ────────────────────────────────────────────────── */
+.mod-menu-btn {
+  border-color: #0090E7 !important;
+  color: #00C3FF !important;
+  background: linear-gradient(180deg,#002a45 0%,#001a2d 50%,#000e1a 100%) !important;
+}
+.mod-menu-btn:hover {
+  border-color: #00AAFF !important;
+  color: #66D9FF !important;
+  background: linear-gradient(180deg,#003a5a 0%,#002a45 50%,#001a30 100%) !important;
+}
+
+/* ── ROOT SCREEN ────────────────────────────────────────────────── */
+#mod-studio-screen {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 130;
+  /* Roblox Studio dark charcoal base */
+  background: #1e1e1e;
+  flex-direction: column;
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  overflow: hidden;
+}
+
+/* ── HEADER — Roblox Studio blue topbar ─────────────────────────── */
+.ms-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 12px;
+  height: 42px;
+  /* Roblox Studio signature blue gradient header */
+  background: linear-gradient(180deg, #0098FF 0%, #006FCC 100%);
+  border-bottom: 2px solid #004a99;
+  flex-shrink: 0;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+}
+
+.ms-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  margin-right: 8px;
+  padding-right: 12px;
+  border-right: 1px solid rgba(255,255,255,0.25);
+}
+.ms-logo-text {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: #ffffff;
+  letter-spacing: 2px;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.4);
+}
+.ms-logo-ver {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: rgba(255,255,255,0.55);
+  margin-left: 2px;
+}
+
+/* Toolbar buttons — Roblox Studio ribbon style */
+.ms-toolbar {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+}
+.ms-toolbar .mbtn {
+  padding: 5px 10px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  min-width: auto;
+  letter-spacing: 0.5px;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: #ffffff;
+  border-radius: 3px;
+  transition: all .1s;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.35);
+  white-space: nowrap;
+}
+.ms-toolbar .mbtn:hover {
+  background: rgba(255,255,255,0.25);
+  border-color: rgba(255,255,255,0.55);
+  color: #ffffff;
+  transform: none;
+}
+.ms-toolbar .mbtn:active {
+  background: rgba(0,0,0,0.15);
+  transform: scale(0.97);
+}
+
+/* Run button — Roblox green play */
+.ms-btn-run {
+  background: linear-gradient(180deg, #3ECF6B 0%, #27A84E 100%) !important;
+  border-color: #1d8a3d !important;
+  color: #ffffff !important;
+  font-weight: bold;
+}
+.ms-btn-run:hover {
+  background: linear-gradient(180deg, #4FDD7A 0%, #35BB5C 100%) !important;
+  border-color: #2aaa50 !important;
+}
+
+/* Download ZIP */
+.ms-btn-zip {
+  background: linear-gradient(180deg, #5080E0 0%, #3060C0 100%) !important;
+  border-color: #2040a0 !important;
+  color: #ffffff !important;
+}
+.ms-btn-zip:hover {
+  background: linear-gradient(180deg, #6090F0 0%, #4070D0 100%) !important;
+}
+
+/* Close / Back */
+.ms-btn-back {
+  background: linear-gradient(180deg, #D04040 0%, #A02828 100%) !important;
+  border-color: #801818 !important;
+  color: #ffffff !important;
+}
+.ms-btn-back:hover {
+  background: linear-gradient(180deg, #E05050 0%, #C03030 100%) !important;
+}
+
+/* ── BODY ───────────────────────────────────────────────────────── */
+.ms-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+  background: #1e1e1e;
+}
+
+/* ── LEFT: CODE EDITOR PANE ─────────────────────────────────────── */
+.ms-editor-pane {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 590px;
+  /* Roblox Studio dark panel separator */
+  border-right: 2px solid #141414;
+  overflow: hidden;
+  background: #252526;
+}
+
+/* Editor top bar — file tab style */
+.ms-editor-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  height: 34px;
+  /* VS-Code-inspired tab row inside Roblox Studio */
+  background: #2d2d2d;
+  border-bottom: 2px solid #0098FF;
+  flex-shrink: 0;
+}
+.ms-file-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: #d4d4d4;
+  padding: 4px 12px;
+  background: #252526;
+  border: 1px solid #3c3c3c;
+  border-bottom: 2px solid #0098FF;
+  margin-bottom: -2px;
+}
+.ms-hint {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6px;
+  color: #555555;
+  flex: 1;
+}
+
+#mod-editor-status {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  padding: 2px 8px;
+}
+.mod-st-info { color: #858585; }
+.mod-st-ok   { color: #4EC9B0; text-shadow: 0 0 6px rgba(78,201,176,0.5); }
+.mod-st-warn { color: #FFCC00; }
+.mod-st-err  { color: #F44747; text-shadow: 0 0 6px rgba(244,71,71,0.4); }
+.mod-st-run  { color: #569CD6; text-shadow: 0 0 6px rgba(86,156,214,0.5); }
+
+/* Editor body with line numbers */
+.ms-editor-wrap {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+.ms-line-nums {
+  width: 42px;
+  padding: 10px 6px 10px 0;
+  text-align: right;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  line-height: 18px;
+  color: #4a4a4a;
+  background: #1e1e1e;
+  border-right: 1px solid #2a2a2a;
+  overflow: hidden;
+  user-select: none;
+  flex-shrink: 0;
+  white-space: pre;
+}
+.ms-textarea {
+  flex: 1;
+  padding: 10px 12px;
+  /* True dark editor — VS-Code Monaco style */
+  background: #1e1e1e;
+  color: #d4d4d4;
+  font-family: 'Courier New', 'Consolas', monospace;
+  font-size: 12px;
+  line-height: 18px;
+  border: none;
+  outline: none;
+  resize: none;
+  tab-size: 2;
+  white-space: pre;
+  overflow: auto;
+  caret-color: #d4d4d4;
+}
+.ms-textarea::selection {
+  background: rgba(38,79,120,0.7);
+}
+.ms-textarea::placeholder {
+  color: #3a3a3a;
+  font-size: 10px;
+}
+
+/* ── RIGHT: INFO / PANEL PANE ───────────────────────────────────── */
+.ms-info-pane {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  min-width: 0;
+  /* Roblox Studio right panel slightly lighter */
+  background: #252526;
+}
+
+/* Tabs bar */
+.ms-tabs {
+  display: flex;
+  flex-shrink: 0;
+  background: #2d2d2d;
+  border-bottom: 2px solid #141414;
+}
+.mod-tab {
+  flex: 1;
+  padding: 9px 4px;
+  background: transparent;
+  border: none;
+  border-right: 1px solid #1a1a1a;
+  color: #7a7a7a;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6.5px;
+  cursor: pointer;
+  transition: all .12s;
+  letter-spacing: 0.5px;
+}
+.mod-tab:last-child { border-right: none; }
+.mod-tab:hover {
+  color: #cccccc;
+  background: rgba(255,255,255,0.05);
+}
+.mod-tab.active {
+  color: #ffffff;
+  background: #252526;
+  border-bottom: 2px solid #0098FF;
+  margin-bottom: -2px;
+}
+
+.mod-tab-pane {
+  display: none;
+  flex: 1;
+  overflow: hidden;
+  flex-direction: column;
+}
+.mod-tab-pane.active { display: flex; }
+
+/* ── CONSOLE ────────────────────────────────────────────────────── */
+.ms-console {
+  flex: 1;
+  padding: 8px 10px;
+  overflow-y: auto;
+  /* Real dark terminal */
+  background: #1a1a1a;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  line-height: 2;
+}
+.ms-console::-webkit-scrollbar { width: 8px; }
+.ms-console::-webkit-scrollbar-track { background: #1a1a1a; }
+.ms-console::-webkit-scrollbar-thumb { background: #3c3c3c; border-radius: 2px; }
+
+.mod-console-line { word-break: break-word; margin-bottom: 1px; }
+.mod-cl-ok   { color: #4EC9B0; }
+.mod-cl-warn { color: #FFCC00; }
+.mod-cl-err  { color: #F44747; }
+.mod-cl-info { color: #569CD6; }
+
+/* ── API DOCS ───────────────────────────────────────────────────── */
+.ms-docs {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+  background: #1e1e1e;
+}
+.ms-docs::-webkit-scrollbar { width: 8px; }
+.ms-docs::-webkit-scrollbar-track { background: #1e1e1e; }
+.ms-docs::-webkit-scrollbar-thumb { background: #3c3c3c; border-radius: 2px; }
+
+.mdoc {
+  margin-bottom: 10px;
+  border: 1px solid #2d2d2d;
+  background: #252526;
+}
+.mdoc-h {
+  padding: 6px 10px;
+  color: #569CD6;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  font-weight: bold;
+  border-bottom: 1px solid #2d2d2d;
+  background: #2a2a2a;
+  letter-spacing: 0.5px;
+}
+.mdoc-d {
+  padding: 5px 10px;
+  color: #858585;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  line-height: 1.8;
+}
+.mdoc-c {
+  padding: 8px 10px;
+  color: #9CDCFE;
+  font-size: 10px;
+  line-height: 1.6;
+  white-space: pre;
+  overflow-x: auto;
+  background: #1a1a1a;
+  border-top: 1px solid #2d2d2d;
+  font-family: 'Courier New', monospace;
+  border-left: 3px solid #0098FF;
+  margin: 0;
+}
+
+/* ── SAVED MODS ─────────────────────────────────────────────────── */
+.ms-saves {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+  background: #1e1e1e;
+}
+.ms-saves::-webkit-scrollbar { width: 8px; }
+.ms-saves::-webkit-scrollbar-track { background: #1e1e1e; }
+.ms-saves::-webkit-scrollbar-thumb { background: #3c3c3c; border-radius: 2px; }
+
+.msave-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 12px;
+  border: 1px solid #2d2d2d;
+  margin-bottom: 5px;
+  gap: 8px;
+  background: #252526;
+  transition: border-color .15s, background .15s;
+}
+.msave-row:hover {
+  border-color: #0098FF;
+  background: #2a2d33;
+}
+.msave-name {
+  color: #d4d4d4;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+}
+.msave-date {
+  color: #555555;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6.5px;
+  margin-top: 4px;
+}
+.msave-btns { display: flex; gap: 4px; flex-shrink: 0; }
+.msave-btns .mbtn {
+  padding: 4px 8px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  min-width: auto;
+  background: #2d2d2d;
+  border-color: #3c3c3c;
+  color: #cccccc;
+}
+.msave-btns .mbtn:hover {
+  background: #363636;
+  border-color: #0098FF;
+  color: #ffffff;
+  transform: none;
+}
+.msave-empty {
+  color: #3a3a3a;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  text-align: center;
+  padding: 30px 20px;
+  line-height: 2.5;
+}
+
+/* ── FOOTER STATUS BAR ──────────────────────────────────────────── */
+.ms-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 14px;
+  /* Roblox Studio bottom status bar — dark blue */
+  background: #007ACC;
+  border-top: 1px solid #005a9e;
+  flex-shrink: 0;
+}
+.ms-footer span {
+  color: #ffffff;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6.5px;
+  opacity: 0.85;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.3);
+  letter-spacing: 0.3px;
 }

@@ -1,9 +1,13 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>PixelSurvive - Enhanced</title>
+<title>PixelSurvive - Enhanced + Mod Studio</title>
 <script src="https://unpkg.com/peerjs@1.5.1/dist/peerjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="ui.css">
 </head>
 <body>
@@ -11,134 +15,267 @@
 <canvas id="c"></canvas>
 <div id="tip"></div>
 <div id="hints">
-  A/D · Di chuyển<br>W · Space · Nhảy<br>
-  Click trái ▶ Đào / Đánh<br>Click phải ◀ Đặt / Ăn<br>
-  E · Chế tạo<br>F · Lò nung<br>1–9 · Chọn ô<br>ESC · Tạm dừng
+  A/D · Move<br>W · Space · Jump<br>
+  Left click ▶ Mine / Attack<br>Right click ◀ Place / Eat<br>
+  E · Craft<br>F · Furnace<br>1–9 · Select slot<br>ESC · Pause
 </div>
+
+<!-- ── MAIN MENU ───────────────────────────────────────────────── -->
 <div id="menu-overlay">
   <div id="menu-bg"><canvas id="menubg"></canvas></div>
   <div id="menu-content">
     <div class="menu-title">PIXEL SURVIVE</div>
-    <div class="menu-sub" id="menu-sub">Phiên bản 2.0 - Enhanced</div>
-    <div class="menu-splash" id="splash-text">Cày cuốc làm giàu!</div>
-    <button class="mbtn" id="btn-play">Choi Don</button>
-    <button class="mbtn" id="btn-online">Choi Mang</button>
-    <button class="mbtn" id="btn-skin">Tuy Chinh Nhan Vat</button>
-    <button class="mbtn" id="btn-settings">Cai Dat</button>
-    <button class="mbtn" id="btn-credits">Tin Dung</button>
+    <div class="menu-sub" id="menu-sub">Version 2.0 - Enhanced</div>
+    <div class="menu-splash" id="splash-text">Grind to get rich!</div>
+    <button class="mbtn" id="btn-play">Play Offline</button>
+    <button class="mbtn" id="btn-online">Play Online</button>
+    <button class="mbtn" id="btn-skin">Customize Character</button>
+    <button class="mbtn" id="btn-settings">Settings</button>
+    <button class="mbtn" id="btn-credits">Credits</button>
+    <button class="mbtn mod-menu-btn" id="btn-modsudio">Mod Studio</button>
     <div class="menu-ver">PixelSurvive v2.0 Enhanced · 2025</div>
   </div>
 </div>
+
+<!-- ── PLATFORM CHOOSER ─────────────────────────────────────────── -->
 <div id="platform-overlay">
   <div class="platform-panel">
-    <div class="platform-title" id="platform-title">Chọn nền tảng</div>
-    <div class="platform-sub" id="platform-sub">Chọn PC hoặc Mobile trước khi vào thế giới</div>
+    <div class="platform-title" id="platform-title">Choose platform</div>
+    <div class="platform-sub" id="platform-sub">Choose PC or Mobile before entering the world</div>
     <div class="platform-row">
       <button class="mbtn" id="btn-platform-pc">PC</button>
       <button class="mbtn" id="btn-platform-mobile">Mobile</button>
     </div>
   </div>
 </div>
+
+<!-- ── WORLD SELECT ─────────────────────────────────────────────── -->
 <div id="world-screen">
-  <h2 id="world-title">Chọn Thế Giới</h2>
+  <h2 id="world-title">Choose World</h2>
   <div class="world-list" id="world-list"></div>
   <div class="back-row">
-    <button class="mbtn" id="btn-create-world">Tạo Thế Giới Mới</button>
-    <button class="mbtn" id="btn-back-world">Quay Lại</button>
+    <button class="mbtn" id="btn-create-world">Create New World</button>
+    <button class="mbtn" id="btn-back-world">Back</button>
   </div>
 </div>
-<div id="settings-screen">
-  <h2 id="settings-title">Cài Đặt</h2>
-  <div class="setting-row" style="max-width:400px;width:100%;"><label id="player-name-label">Ten nguoi choi</label><input type="text" id="player-name-input" maxlength="16" placeholder="Nhap ten..." style="background:#0c0c1c;border:1px solid #3a3a5a;color:#fff;padding:4px 8px;font-family:'Courier New';font-size:12px;width:140px;"></div>
-  <div class="setting-row"><label id="volume-label">Am luong</label><input type="range" id="vol-slider" min="0" max="100" value="60"><span id="vol-val">60</span></div>
-  <div class="setting-row"><label id="day-speed-label">Tốc độ ngày</label><input type="range" id="day-slider" min="1" max="10" value="3"><span id="day-val">3</span></div>
-  <div class="setting-row setting-mode-row"><label id="control-mode-label">Thiết bị</label><div class="mode-buttons"><button class="mbtn sm mode-btn" id="btn-control-pc">PC</button><button class="mbtn sm mode-btn" id="btn-control-mobile">Mobile</button></div></div>
-  <div class="setting-note" id="control-mode-note">Tự nhận diện khi vừa vào web. Có thể đổi tại đây.</div>
-  <div class="setting-row"><label id="lang-label">Ngôn ngữ</label><button class="mbtn sm" id="btn-lang" style="min-width:140px;">Tiếng Việt</button></div>
-  <button class="mbtn" id="btn-back-settings" style="margin-top:18px;">Xong</button>
-</div>
-<div id="credits-screen">
-  <h2 id="credits-title">Tín Dụng</h2>
-  <p id="credits-text">PixelSurvive v2.0 Enhanced<br>Trò chơi sinh tồn pixel 2D<br>Phát triển bởi: SoidevStudio <br>Engine: Canvas 2D thuần<br>Cảm hứng: Minecraft & Terraria<br>2025</p>
-  <button class="mbtn" id="btn-back-credits" style="margin-top:18px;">Quay Lại</button>
+<div id="create-world-modal" class="create-world-modal" style="display:none;">
+  <div class="create-world-panel">
+    <div class="create-world-title">Create World</div>
+    <div class="create-world-row">
+      <label for="world-seed-input">Seed</label>
+      <input id="world-seed-input" type="text" maxlength="64" placeholder="Seed tu do...">
+    </div>
+    <div class="create-world-row create-world-mode-row">
+      <label>Mode</label>
+      <div class="mode-buttons">
+        <button class="mbtn sm mode-btn active" id="btn-mode-survival">Survive</button>
+        <button class="mbtn sm mode-btn" id="btn-mode-creative">Creation</button>
+      </div>
+    </div>
+    <div class="create-world-actions">
+      <button class="mbtn sm" id="btn-create-confirm">Tạo</button>
+      <button class="mbtn sm" id="btn-create-cancel">Cancel</button>
+    </div>
+  </div>
 </div>
 
+<!-- ── SETTINGS ─────────────────────────────────────────────────── -->
+<div id="settings-screen">
+  <h2 id="settings-title">Cài Đặt</h2>
+  <div class="setting-row" style="max-width:400px;width:100%;"><label id="player-name-label">Player name</label><input type="text" id="player-name-input" maxlength="16" placeholder="Enter name..." style="background:#0c0c1c;border:1px solid #3a3a5a;color:#fff;padding:4px 8px;font-family:'Courier New';font-size:12px;width:140px;"></div>
+  <div class="setting-row"><label id="volume-label">Volume</label><input type="range" id="vol-slider" min="0" max="100" value="60"><span id="vol-val">60</span></div>
+  <div class="setting-row"><label id="day-speed-label">Day speed</label><input type="range" id="day-slider" min="1" max="10" value="3"><span id="day-val">3</span></div>
+  <div class="setting-row setting-mode-row"><label id="control-mode-label">Device</label><div class="mode-buttons"><button class="mbtn sm mode-btn" id="btn-control-pc">PC</button><button class="mbtn sm mode-btn" id="btn-control-mobile">Mobile</button></div></div>
+  <div class="setting-note" id="control-mode-note">Auto-detected when you open the web. You can change it here.</div>
+  <div class="setting-row"><label id="lang-label">Language</label><button class="mbtn sm" id="btn-lang" style="min-width:140px;">English</button></div>
+  <button class="mbtn" id="btn-back-settings" style="margin-top:18px;">Done</button>
+</div>
+
+<!-- ── CREDITS ──────────────────────────────────────────────────── -->
+<div id="credits-screen">
+  <h2 id="credits-title">Credits</h2>
+  <p id="credits-text">PixelSurvive v2.0 Enhanced<br>2D pixel survival game<br>Developed by: PixelStudio<br>Engine: Pure Canvas 2D<br>Inspired by: Minecraft &amp; Terraria<br>2025</p>
+  <button class="mbtn" id="btn-back-credits" style="margin-top:18px;">Back</button>
+</div>
+
+<!-- ── SKIN EDITOR ──────────────────────────────────────────────── -->
 <div id="skin-screen">
-  <h2 id="skin-title">Tùy Chỉnh Nhân Vật</h2>
+  <h2 id="skin-title">Customize Character</h2>
   <div style="display:flex;gap:32px;align-items:flex-start;justify-content:center;flex-wrap:wrap;">
     <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
       <canvas id="skin-preview-c" width="80" height="150" style="background:rgba(20,20,40,0.8);border:2px solid #3a3a5a;image-rendering:pixelated;transform:scale(1.5);transform-origin:top center;margin-bottom:30px;"></canvas>
     </div>
     <div style="display:flex;flex-direction:column;gap:0;">
-      <div class="skin-row"><label id="skin-face-label">Màu da</label><div class="swatches" id="sw-face"></div></div>
-      <div class="skin-row"><label id="skin-shirt-label">Áo</label><div class="swatches" id="sw-shirt"></div></div>
-      <div class="skin-row"><label id="skin-pants-label">Quần</label><div class="swatches" id="sw-pants"></div></div>
-      <div class="skin-row"><label id="skin-shoe-label">Giày</label><div class="swatches" id="sw-shoe"></div></div>
+      <div class="skin-row"><label id="skin-face-label">Skin tone</label><div class="swatches" id="sw-face"></div></div>
+      <div class="skin-row"><label id="skin-shirt-label">Shirt</label><div class="swatches" id="sw-shirt"></div></div>
+      <div class="skin-row"><label id="skin-pants-label">Pants</label><div class="swatches" id="sw-pants"></div></div>
+      <div class="skin-row"><label id="skin-shoe-label">Shoes</label><div class="swatches" id="sw-shoe"></div></div>
     </div>
   </div>
-  <div id="skin-sample-label" style="margin-top:18px;color:#6a6a8a;font-size:11px;">Skin mẫu</div>
+  <div id="skin-sample-label" style="margin-top:18px;color:#6a6a8a;font-size:11px;">Sample skin</div>
   <div class="preset-row" id="skin-presets"></div>
   <div style="display:flex;gap:10px;margin-top:18px;">
-    <button class="mbtn" id="btn-save-skin">Luu Skin</button>
-    <button class="mbtn" id="btn-back-skin">Quay Lại</button>
+    <button class="mbtn" id="btn-save-skin">Save Skin</button>
+    <button class="mbtn" id="btn-back-skin">Back</button>
   </div>
 </div>
+
+<!-- ── ONLINE ────────────────────────────────────────────────────── -->
 <div id="online-screen">
-  <h2 id="online-title">Choi Mang</h2>
+  <h2 id="online-title">Play Online</h2>
   <div class="name-input-row">
-    <label id="online-name-label">Ten cua ban:</label>
-    <input type="text" id="online-name-input" maxlength="16" placeholder="Nhap ten...">
+    <label id="online-name-label">Your name:</label>
+    <input type="text" id="online-name-input" maxlength="16" placeholder="Enter name...">
   </div>
   <div class="online-section">
     <h3 id="create-room-title">TAO PHONG</h3>
-    <button class="mbtn" id="btn-create-room">Tao Phong Moi</button>
+    <button class="mbtn" id="btn-create-room">Create New Room</button>
     <div class="id-display" id="room-id-box">
-      <div style="color:#aaa;font-size:11px;"><span id="room-share-text">ID PHONG CUA BAN — chia se cho ban be:</span></div>
+      <div style="color:#aaa;font-size:11px;"><span id="room-share-text">YOUR ROOM ID — share it with friends:</span></div>
       <div class="id-val" id="room-id-val"></div>
-      <button class="mbtn sm" id="btn-copy-id">Sao Chep ID</button>
+      <button class="mbtn sm" id="btn-copy-id">Copy ID</button>
       <div id="guest-list" style="margin-top:8px;font-size:11px;color:#6a6a8a;"></div>
     </div>
   </div>
   <div class="online-section">
-    <h3 id="join-room-title">THAM GIA PHONG</h3>
+    <h3 id="join-room-title">JOIN ROOM</h3>
     <div class="join-row">
-      <input type="text" id="join-id-input" placeholder="Nhap ID phong...">
-      <button class="mbtn sm" id="btn-join-room">Ket Noi</button>
+      <input type="text" id="join-id-input" placeholder="Enter room ID...">
+      <button class="mbtn sm" id="btn-join-room">Connect</button>
     </div>
   </div>
   <div id="online-status"></div>
-  <button class="mbtn" id="btn-back-online" style="margin-top:8px;">Quay Lai</button>
+  <button class="mbtn" id="btn-back-online" style="margin-top:8px;">Back</button>
 </div>
+
+<!-- ── PAUSE ────────────────────────────────────────────────────── -->
 <div id="pause-overlay">
-  <h2 id="pause-title">Tạm Dừng</h2>
-  <button class="mbtn" id="btn-resume">Tiếp Tục</button>
-  <button class="mbtn" id="btn-save-quit">Lưu & Thoát</button>
+  <h2 id="pause-title">Paused</h2>
+  <button class="mbtn" id="btn-resume">Resume</button>
+  <button class="mbtn" id="btn-save-quit">Save &amp; Quit</button>
 </div>
+
+<!-- ── FURNACE ──────────────────────────────────────────────────── -->
 <div id="furnace-overlay">
   <div class="furnace-panel">
     <div class="furnace-close" id="furnace-close-btn">&times;</div>
-    <div><div class="furnace-slot" id="furn-input"></div><div class="furnace-label" id="furn-input-label">Nguyên liệu</div></div>
-    <div><div class="furnace-slot" id="furn-fuel"></div><div class="furnace-label" id="furn-fuel-label">Nhiên liệu</div><div class="furnace-bar"><div class="furnace-bar-fill" id="furn-fuel-bar"></div></div></div>
+    <div><div class="furnace-slot" id="furn-input"></div><div class="furnace-label" id="furn-input-label">Input</div></div>
+    <div><div class="furnace-slot" id="furn-fuel"></div><div class="furnace-label" id="furn-fuel-label">Fuel</div><div class="furnace-bar"><div class="furnace-bar-fill" id="furn-fuel-bar"></div></div></div>
     <div class="furnace-arrow">▶</div>
-    <div><div class="furnace-slot" id="furn-output" style="border-color:#50C878;"></div><div class="furnace-label" id="furn-output-label">Kết quả</div><div class="furnace-bar"><div class="furnace-bar-fill" id="furn-progress-bar" style="background:#50C878;"></div></div></div>
+    <div><div class="furnace-slot" id="furn-output" style="border-color:#50C878;"></div><div class="furnace-label" id="furn-output-label">Result</div><div class="furnace-bar"><div class="furnace-bar-fill" id="furn-progress-bar" style="background:#50C878;"></div></div></div>
   </div>
 </div>
+</div><!-- /wrap -->
+
+<!-- ── CHAT ─────────────────────────────────────────────────────── -->
+<div id="chat-overlay">
+  <div id="chat-log"></div>
+  <div id="chat-input-wrap" style="display:none;">
+    <span class="chat-prefix">&gt;</span>
+    <input type="text" id="chat-input" maxlength="120" autocomplete="off" placeholder="Message...">
+  </div>
 </div>
+
+<!-- ── MOBILE CONTROLS ──────────────────────────────────────────── -->
 <div id="mobile-controls">
   <div class="mc-left-slot">
-    <button class="mc-jump-btn" id="btn-mobile-jump-left" aria-label="Nhảy">JUMP</button>
+    <button class="mc-jump-btn" id="btn-mobile-jump-left" aria-label="Jump">JUMP</button>
   </div>
   <div class="mc-right-slot">
-    <div id="mobile-joystick" class="mc-joystick" aria-label="Điều khiển di chuyển">
+    <div id="mobile-joystick" class="mc-joystick" aria-label="Move control">
       <div class="mc-joy-base"></div>
       <div class="mc-joy-thumb" id="mc-joy-thumb"></div>
     </div>
   </div>
 </div>
 
+<!-- ════════════════════════════════════════════════════════════════
+     MOD STUDIO SCREEN  (z-index 130, covers everything)
+     ════════════════════════════════════════════════════════════════ -->
+<div id="mod-studio-screen">
+
+  <!-- Header toolbar -->
+  <div class="ms-header">
+    <div class="ms-logo">
+      <span class="ms-logo-text">MOD STUDIO</span>
+      <span class="ms-logo-ver">v1.0</span>
+    </div>
+    <div class="ms-toolbar">
+      <button class="mbtn sm ms-btn-run"  id="btn-mod-run"      title="Ctrl+Enter">RUN</button>
+      <button class="mbtn sm"             id="btn-mod-save"     >SAVE</button>
+      <button class="mbtn sm"             id="btn-mod-load"     >MY MODS</button>
+      <button class="mbtn sm"             id="btn-mod-reset"    >RESET</button>
+      <button class="mbtn sm"             id="btn-mod-clear-mod">CLEAR MODS</button>
+      <button class="mbtn sm ms-btn-zip"  id="btn-mod-download" >DOWNLOAD ZIP</button>
+      <button class="mbtn sm ms-btn-back" id="btn-back-modstudio">CLOSE</button>
+    </div>
+  </div>
+
+  <!-- Body: editor left | info right -->
+  <div class="ms-body">
+
+    <!-- LEFT: code editor -->
+    <div class="ms-editor-pane">
+      <div class="ms-editor-bar">
+        <span class="ms-file-label">user_mod.js</span>
+        <span class="ms-hint">Ctrl+Enter to run</span>
+        <span id="mod-editor-status" class="mod-st-info">Ready</span>
+      </div>
+      <div class="ms-editor-wrap">
+        <div id="mod-line-numbers" class="ms-line-nums"></div>
+        <textarea
+          id="mod-code-editor"
+          class="ms-textarea"
+          spellcheck="false"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          placeholder="// Write your mod here…"></textarea>
+      </div>
+    </div>
+
+    <!-- RIGHT: tabs panel -->
+    <div class="ms-info-pane">
+      <div class="ms-tabs">
+        <button class="mod-tab active" data-tab="console">CONSOLE</button>
+        <button class="mod-tab"        data-tab="docs"   >API DOCS</button>
+        <button class="mod-tab"        data-tab="mods"   >SAVES</button>
+      </div>
+
+      <!-- Console tab -->
+      <div id="mtp-console" class="mod-tab-pane active">
+        <div id="mod-console" class="ms-console">
+          <div class="mod-console-line mod-cl-info">[PixelMod] Mod Studio ready. Write code and press RUN.</div>
+          <div class="mod-console-line mod-cl-info">[PixelMod] Tip: Start a world first, then run your mod to give items!</div>
+        </div>
+      </div>
+
+      <!-- API Docs tab -->
+      <div id="mtp-docs" class="mod-tab-pane">
+        <div id="mod-docs-content" class="ms-docs"></div>
+      </div>
+
+      <!-- Saved mods tab -->
+      <div id="mtp-mods" class="mod-tab-pane">
+        <div id="mod-saved-list" class="ms-saves"></div>
+      </div>
+    </div>
+
+  </div><!-- /ms-body -->
+
+  <!-- Footer status bar -->
+  <div class="ms-footer">
+    <span>PixelMod API v1.0  |  Block IDs 100-220  |  Ctrl+Enter = Run</span>
+    <span id="ms-block-count"></span>
+  </div>
+
+</div><!-- /mod-studio-screen -->
+
+<!-- ── SCRIPTS ──────────────────────────────────────────────────── -->
 <script src="main-01-init.js"></script>
 <script src="main-02-world.js"></script>
 <script src="main-03-render.js"></script>
 <script src="main-04-ui.js"></script>
+<script src="main-05-modding.js"></script>
 </body>
 </html>

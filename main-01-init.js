@@ -29,10 +29,10 @@ let controlMode = getStoredControlMode() || detectControlMode();
 let platformChooserOpen = false;
 let platformNextTarget = 'world';
 
-let lang = localStorage.getItem('ps_lang') || 'vi';
+let lang = localStorage.getItem('ps_lang') || 'en';
 const UI_TEXT = {"vi": {"menuSub": "Phi\u00ean b\u1ea3n 2.0 - Enhanced", "splash": ["C\u00e0y cu\u1ed1c l\u00e0m gi\u00e0u!", "X\u00e2y \u0111\u1eafp \u01b0\u1edbc m\u01a1!", "Sinh t\u1ed3n l\u00e0 s\u1ed1 1!", "Kh\u00e1m ph\u00e1 th\u1ebf gi\u1edbi!", "\u0110\u00e0o s\u00e2u t\u00ecm kho b\u00e1u!", "\u0110\u00eam t\u1ed1i r\u00f9ng r\u1ee3n!", "Ch\u1ebf t\u1ea1o v\u0169 kh\u00ed!", "Kim c\u01b0\u01a1ng \u1edf ph\u00eda d\u01b0\u1edbi!", "Zombie \u0111ang \u0111\u1ebfn!", "Heo con \u0111\u00e1ng y\u00eau!", "TNT n\u1ed5 tung!", "Gi\u00e1p kim c\u01b0\u01a1ng OP!", "L\u00f2 nung th\u1eddi \u0111\u1ea1i!", "N\u1ea5m \u0111\u1ed9c? Th\u1eed xem!", "X\u01b0\u01a1ng r\u1ed3ng ng\u1ee9a l\u1eafm!"], "play": "Choi Don", "online": "Choi Mang", "skin": "Tuy Chinh Nhan Vat", "settings": "Cai Dat", "device": "Thiet bi", "deviceNote": "Tu nhan dien khi vua vao web. Co the doi tai day.", "credits": "Tin Dung", "worldTitle": "Ch\u1ecdn Th\u1ebf Gi\u1edbi", "createWorld": "T\u1ea1o Th\u1ebf Gi\u1edbi M\u1edbi", "back": "Quay L\u1ea1i", "settingsTitle": "C\u00e0i \u0110\u1eb7t", "playerName": "Ten nguoi choi", "volume": "Am luong", "daySpeed": "T\u1ed1c \u0111\u1ed9 ng\u00e0y", "lang": "Ng\u00f4n ng\u1eef", "langBtn": "Ti\u1ebfng Vi\u1ec7t", "done": "Xong", "creditsTitle": "T\u00edn D\u1ee5ng", "creditsText": "PixelSurvive v2.0 Enhanced<br>Tr\u00f2 ch\u01a1i sinh t\u1ed3n pixel 2D<br>Ph\u00e1t tri\u1ec3n b\u1edfi: PixelStudio<br>Engine: Canvas 2D thu\u1ea7n<br>C\u1ea3m h\u1ee9ng: Minecraft & Terraria<br>2025", "skinTitle": "T\u00f9y Ch\u1ec9nh Nh\u00e2n V\u1eadt", "platformTitle": "Ch\u1ecdn n\u1ec1n t\u1ea3ng", "platformSub": "Ch\u1ecdn PC ho\u1eb7c Mobile tr\u01b0\u1edbc khi v\u00e0o th\u1ebf gi\u1edbi", "platformPc": "PC", "platformMobile": "Mobile", "onlineTitle": "Choi Mang", "onlineName": "Ten cua ban:", "createRoomTitle": "TAO PHONG", "createRoom": "Tao Phong Moi", "roomShare": "ID PHONG CUA BAN \u2014 chia se cho ban be:", "copyId": "Sao Chep ID", "joinRoomTitle": "THAM GIA PHONG", "joinId": "Nhap ID phong...", "connect": "Ket Noi", "pause": "T\u1ea1m D\u1eebng", "resume": "Ti\u1ebfp T\u1ee5c", "saveQuit": "L\u01b0u & Tho\u00e1t", "furnIn": "Nguy\u00ean li\u1ec7u", "furnFuel": "Nhi\u00ean li\u1ec7u", "furnOut": "K\u1ebft qu\u1ea3", "saved": "Da Luu!", "saveSkin": "Luu Skin", "allSlotsFull": "T\u1ea5t c\u1ea3 \u00f4 \u0111\u00e3 \u0111\u1ea7y! H\u00e3y x\u00f3a m\u1ed9t th\u1ebf gi\u1edbi.", "hints": "A/D \u00b7 Di chuy\u1ec3n<br>W \u00b7 Space \u00b7 Nh\u1ea3y<br>Click tr\u00e1i \u25b6 \u0110\u00e0o / \u0110\u00e1nh<br>Click ph\u1ea3i \u25c0 \u0110\u1eb7t / \u0102n<br>E \u00b7 Ch\u1ebf t\u1ea1o<br>F \u00b7 L\u00f2 nung<br>1\u20139 \u00b7 Ch\u1ecdn \u00f4<br>ESC \u00b7 T\u1ea1m d\u1eebng", "namePh": "Nhap ten...", "roomIdPh": "Nhap ID phong...", "playerNamePlaceholder": "Nhap ten..."}, "en": {"menuSub": "Version 2.0 - Enhanced", "splash": ["Grind to get rich!", "Build your dream!", "Survival is king!", "Explore the world!", "Dig deep for treasure!", "The night is scary!", "Craft your weapons!", "Diamonds are below!", "Zombies are coming!", "Cute little pig!", "TNT goes BOOM!", "Diamond gear OP!", "Furnace age!", "Poison mushroom? Try it!", "Cactus hurts!"], "play": "Play Offline", "online": "Play Online", "skin": "Customize Character", "settings": "Settings", "device": "Device", "deviceNote": "Auto-detected when you open the web. You can change it here.", "credits": "Credits", "worldTitle": "Choose World", "createWorld": "Create New World", "back": "Back", "settingsTitle": "Settings", "playerName": "Player name", "volume": "Volume", "daySpeed": "Day speed", "lang": "Language", "langBtn": "English", "done": "Done", "creditsTitle": "Credits", "creditsText": "PixelSurvive v2.0 Enhanced<br>2D pixel survival game<br>Developed by: PixelStudio<br>Engine: Pure Canvas 2D<br>Inspired by: Minecraft & Terraria<br>2025", "skinTitle": "Customize Character", "platformTitle": "Choose platform", "platformSub": "Choose PC or Mobile before entering the world", "platformPc": "PC", "platformMobile": "Mobile", "onlineTitle": "Play Online", "onlineName": "Your name:", "createRoomTitle": "CREATE ROOM", "createRoom": "Create New Room", "roomShare": "YOUR ROOM ID \u2014 share it with friends:", "copyId": "Copy ID", "joinRoomTitle": "JOIN ROOM", "joinId": "Enter room ID...", "connect": "Connect", "pause": "Paused", "resume": "Resume", "saveQuit": "Save & Quit", "furnIn": "Input", "furnFuel": "Fuel", "furnOut": "Result", "saved": "Saved!", "saveSkin": "Save Skin", "allSlotsFull": "All slots are full! Please delete a world.", "hints": "A/D \u00b7 Move<br>W \u00b7 Space \u00b7 Jump<br>Left click \u25b6 Mine / Attack<br>Right click \u25c0 Place / Eat<br>E \u00b7 Craft<br>F \u00b7 Furnace<br>1\u20139 \u00b7 Select slot<br>ESC \u00b7 Pause", "namePh": "Enter name...", "roomIdPh": "Enter room ID...", "playerNamePlaceholder": "Enter name..."}};
-const BLOCK_NAME_EN = {"1": "Grass", "2": "Dirt", "3": "Stone", "4": "Wood", "5": "Leaves", "6": "Coal Ore", "7": "Iron Ore", "8": "Gold Ore", "9": "Sand", "10": "Wood Planks", "11": "Crafting Table", "12": "Torch", "13": "Water", "14": "Diamond Ore", "15": "Emerald Ore", "16": "Copper Ore", "17": "Snow", "18": "Ice", "19": "Gravel", "20": "Clay", "21": "Bricks", "22": "Glass", "23": "Furnace", "24": "Chest", "25": "Bed", "26": "Obsidian", "27": "Bedrock", "28": "Cactus", "29": "Pumpkin", "30": "Red Flower", "31": "Yellow Flower", "32": "Mushroom", "33": "Mossy Stone", "34": "Bookshelf", "35": "Wool", "36": "TNT", "37": "Lantern", "38": "Sandstone", "39": "Magma", "40": "Bone", "41": "Pine Log", "42": "Ice Spike", "43": "Cobblestone", "44": "Iron Block", "45": "Gold Block", "46": "Diamond Block", "47": "Door (Closed)", "48": "Door (Open)", "49": "Door (Top)", "50": "Door (Top Open)"};
-const ITEM_NAME_EN = {"DIRT": "Dirt", "STONE": "Stone", "LOG": "Wood", "SAND": "Sand", "PLANK": "Wood Planks", "BENCH": "Crafting Table", "TORCH": "Torch", "COAL": "Coal", "IRON_ORE": "Iron Ore", "GOLD_ORE": "Gold Ore", "STICK": "Stick", "MEAT": "Raw Meat", "WOOD_PICK": "Wood Pickaxe", "STONE_PICK": "Stone Pickaxe", "IRON_PICK": "Iron Pickaxe", "WOOD_AXE": "Wood Axe", "IRON_AXE": "Iron Axe", "WOOD_SWORD": "Wood Sword", "IRON_SWORD": "Iron Sword", "DIAMOND": "Diamond", "EMERALD": "Emerald", "COPPER_ORE": "Copper Ore", "COPPER_INGOT": "Copper Ingot", "IRON_INGOT": "Iron Ingot", "GOLD_INGOT": "Gold Ingot", "DIAMOND_PICK": "Diamond Pickaxe", "DIAMOND_SWORD": "Diamond Sword", "DIAMOND_AXE": "Diamond Axe", "COOKED_MEAT": "Cooked Meat", "BREAD": "Bread", "APPLE": "Apple", "GOLDEN_APPLE": "Golden Apple", "FURNACE": "Furnace", "CHEST": "Chest", "BED": "Bed", "BRICK": "Brick", "GLASS": "Glass", "SNOW_BALL": "Snowball", "ICE": "Ice", "GRAVEL": "Gravel", "CLAY": "Clay", "OBSIDIAN": "Obsidian", "CACTUS": "Cactus", "PUMPKIN": "Pumpkin", "MUSHROOM": "Mushroom", "MOSS_STONE": "Mossy Stone", "BOOKSHELF": "Bookshelf", "WOOL": "Wool", "TNT": "TNT", "LEATHER": "Leather", "STRING": "String", "ARROW": "Arrow", "BOW": "Bow", "IRON_CHESTPLATE": "Iron Chestplate", "DIAMOND_CHESTPLATE": "Diamond Chestplate", "SHIELD": "Shield", "BOOK": "Book", "FLINT": "Flint", "BUCKET": "Bucket", "COMPASS": "Compass", "ROPE": "Rope", "LANTERN": "Lantern", "SANDSTONE": "Sandstone", "MAGMA": "Magma", "BONE": "Bone", "PINE_LOG": "Pine Log", "POTION": "Health Potion", "COBBLESTONE": "Cobblestone", "IRON_BLOCK": "Iron Block", "GOLD_BLOCK": "Gold Block", "DIAMOND_BLOCK": "Diamond Block", "DOOR": "Door"};
+const BLOCK_NAME_EN = {"1": "Grass", "2": "Dirt", "3": "Stone", "4": "Wood", "5": "Leaves", "6": "Coal Ore", "7": "Iron Ore", "8": "Gold Ore", "9": "Sand", "10": "Wood Planks", "11": "Crafting Table", "12": "Torch", "13": "Water", "14": "Diamond Ore", "15": "Emerald Ore", "16": "Copper Ore", "17": "Snow", "18": "Ice", "19": "Gravel", "20": "Clay", "21": "Bricks", "22": "Glass", "23": "Furnace", "24": "Chest", "25": "Bed", "26": "Obsidian", "27": "Bedrock", "28": "Cactus", "29": "Pumpkin", "30": "Red Flower", "31": "Yellow Flower", "32": "Mushroom", "33": "Mossy Stone", "34": "Bookshelf", "35": "Wool", "36": "TNT", "37": "Lantern", "38": "Sandstone", "39": "Magma", "40": "Bone", "41": "Pine Log", "42": "Ice Spike", "43": "Cobblestone", "44": "Iron Block", "45": "Gold Block", "46": "Diamond Block", "47": "Door (Closed)", "48": "Door (Open)", "49": "Door (Top)", "50": "Door (Top Open)", "51": "Crystal", "52": "Terracotta", "53": "Basalt", "54": "Mud", "55": "Hay Bale", "56": "Mossy Cobblestone"};
+const ITEM_NAME_EN = {"DIRT": "Dirt", "STONE": "Stone", "LOG": "Wood", "SAND": "Sand", "PLANK": "Wood Planks", "BENCH": "Crafting Table", "TORCH": "Torch", "COAL": "Coal", "IRON_ORE": "Iron Ore", "GOLD_ORE": "Gold Ore", "STICK": "Stick", "MEAT": "Raw Meat", "WOOD_PICK": "Wood Pickaxe", "STONE_PICK": "Stone Pickaxe", "IRON_PICK": "Iron Pickaxe", "WOOD_AXE": "Wood Axe", "IRON_AXE": "Iron Axe", "WOOD_SWORD": "Wood Sword", "IRON_SWORD": "Iron Sword", "DIAMOND": "Diamond", "EMERALD": "Emerald", "COPPER_ORE": "Copper Ore", "COPPER_INGOT": "Copper Ingot", "IRON_INGOT": "Iron Ingot", "GOLD_INGOT": "Gold Ingot", "DIAMOND_PICK": "Diamond Pickaxe", "DIAMOND_SWORD": "Diamond Sword", "DIAMOND_AXE": "Diamond Axe", "COOKED_MEAT": "Cooked Meat", "BREAD": "Bread", "APPLE": "Apple", "GOLDEN_APPLE": "Golden Apple", "FURNACE": "Furnace", "CHEST": "Chest", "BED": "Bed", "BRICK": "Brick", "GLASS": "Glass", "SNOW_BALL": "Snowball", "ICE": "Ice", "GRAVEL": "Gravel", "CLAY": "Clay", "OBSIDIAN": "Obsidian", "CACTUS": "Cactus", "PUMPKIN": "Pumpkin", "MUSHROOM": "Mushroom", "MOSS_STONE": "Mossy Stone", "BOOKSHELF": "Bookshelf", "WOOL": "Wool", "TNT": "TNT", "LEATHER": "Leather", "STRING": "String", "ARROW": "Arrow", "BOW": "Bow", "IRON_CHESTPLATE": "Iron Chestplate", "DIAMOND_CHESTPLATE": "Diamond Chestplate", "SHIELD": "Shield", "BOOK": "Book", "FLINT": "Flint", "BUCKET": "Bucket", "COMPASS": "Compass", "ROPE": "Rope", "LANTERN": "Lantern", "SANDSTONE": "Sandstone", "MAGMA": "Magma", "BONE": "Bone", "PINE_LOG": "Pine Log", "POTION": "Health Potion", "COBBLESTONE": "Cobblestone", "IRON_BLOCK": "Iron Block", "GOLD_BLOCK": "Gold Block", "DIAMOND_BLOCK": "Diamond Block", "DOOR": "Door", "CRYSTAL": "Crystal", "TERRACOTTA": "Terracotta", "BASALT": "Basalt", "MUD": "Mud", "HAY_BALE": "Hay Bale", "MOSSY_COBBLE": "Mossy Cobblestone"};
 const SPLASHES = { vi: UI_TEXT.vi.splash, en: UI_TEXT.en.splash };
 function t(key){ return (UI_TEXT[lang] && UI_TEXT[lang][key]) || (UI_TEXT.vi && UI_TEXT.vi[key]) || key; }
 function blockName(id){ const d = BD[id]; return lang === 'en' ? (BLOCK_NAME_EN[id] || d?.n || '') : (d?.n || ''); }
@@ -44,7 +44,7 @@ function refreshControlModeUI(){
   const note=document.getElementById('control-mode-note');
   if(pcBtn) pcBtn.classList.toggle('active', controlMode === 'pc');
   if(mobileBtn) mobileBtn.classList.toggle('active', controlMode === 'mobile');
-  if(note) note.textContent = t('deviceNote') + ' ' + (lang === 'en' ? 'Current mode: ' : 'Chế độ hiện tại: ') + (controlMode === 'mobile' ? 'Mobile' : 'PC');
+  if(note) note.textContent = t('deviceNote') + ' Current mode: ' + (controlMode === 'mobile' ? 'Mobile' : 'PC');
 }
 function saveSettings(){ try{ localStorage.setItem('ps_settings', JSON.stringify({vol:masterVol, daySpeed:daySpeed, lang:lang})); }catch(e){} }
 function setLanguage(next){ lang = next === 'en' ? 'en' : 'vi'; try{ localStorage.setItem('ps_lang', lang); }catch(e){} applyLanguage(); saveSettings(); }
@@ -79,13 +79,13 @@ function applyLanguage(){
   setText('skin-title', t('skinTitle'));
   setText('platform-title', t('platformTitle'));
   setText('platform-sub', t('platformSub'));
-  setText('skin-face-label', lang==='en' ? 'Skin tone' : 'Màu da');
-  setText('skin-hair-label', lang==='en' ? 'Hair' : 'Tóc');
-  setText('skin-eye-label', lang==='en' ? 'Eyes' : 'Mắt');
-  setText('skin-shirt-label', lang==='en' ? 'Shirt' : 'Áo');
-  setText('skin-pants-label', lang==='en' ? 'Pants' : 'Quần');
-  setText('skin-shoe-label', lang==='en' ? 'Shoes' : 'Giày');
-  setText('skin-sample-label', lang==='en' ? 'Sample skin' : 'Skin mẫu');
+  setText('skin-face-label', 'Skin tone');
+  setText('skin-hair-label', 'Hair');
+  setText('skin-eye-label', 'Eyes');
+  setText('skin-shirt-label', 'Shirt');
+  setText('skin-pants-label', 'Pants');
+  setText('skin-shoe-label', 'Shoes');
+  setText('skin-sample-label', 'Sample skin');
   setText('online-title', t('onlineTitle'));
   setText('online-name-label', t('onlineName'));
   setText('create-room-title', t('createRoomTitle'));
@@ -112,7 +112,7 @@ function applyLanguage(){
 function saveControlMode(mode){controlMode = mode === 'mobile' ? 'mobile' : 'pc';try{localStorage.setItem('ps_controlMode',controlMode);}catch(e){}refreshControlModeUI();syncControlUI();}
 function showPlatformChooser(){platformChooserOpen=true;const el=document.getElementById('platform-overlay');if(el)el.style.display='flex';syncControlUI();}
 function hidePlatformChooser(){platformChooserOpen=false;const el=document.getElementById('platform-overlay');if(el)el.style.display='none';syncControlUI();}
-function syncControlUI(){const mobile=controlMode==='mobile';const mc=document.getElementById('mobile-controls');if(mc)mc.style.display=(gameState==='playing'&&mobile)?'flex':'none';const hints=document.getElementById('hints');if(hints)hints.style.display=(gameState==='playing'&&!mobile)?'block':'none';const plat=document.getElementById('platform-overlay');if(plat)plat.style.display=platformChooserOpen?'flex':'none';if(!(gameState==='playing'&&mobile))resetJoystick();refreshControlModeUI();}
+function syncControlUI(){const mobile=controlMode==='mobile';const mc=document.getElementById('mobile-controls');if(mc)mc.style.display=(gameState==='playing'&&mobile)?'flex':'none';const hints=document.getElementById('hints');if(hints)hints.style.display=(gameState==='playing'&&!mobile)?'block':'none';const plat=document.getElementById('platform-overlay');if(plat)plat.style.display=platformChooserOpen?'flex':'none';const chat=document.getElementById('chat-overlay');if(chat)chat.style.display=(gameState==='playing')?'flex':'none';if(!(gameState==='playing'&&mobile))resetJoystick();refreshControlModeUI();}
 function setKeyState(code,down){keys[code]=down;}
 function mobileMove(dir){setKeyState('KeyA',dir<0);setKeyState('ArrowLeft',dir<0);setKeyState('KeyD',dir>0);setKeyState('ArrowRight',dir>0);}
 
@@ -209,7 +209,9 @@ const B={AIR:0,GRASS:1,DIRT:2,STONE:3,LOG:4,LEAVES:5,COAL:6,IRON:7,GOLD:8,SAND:9
   GRAVEL:19,CLAY:20,BRICK:21,GLASS:22,FURNACE:23,CHEST:24,BED:25,OBSIDIAN:26,BEDROCK:27,
   CACTUS:28,PUMPKIN:29,FLOWER_R:30,FLOWER_Y:31,MUSHROOM:32,MOSS_STONE:33,BOOKSHELF:34,WOOL:35,TNT:36,LANTERN:37,
   SANDSTONE:38,MAGMA:39,BONE:40,PINE_LOG:41,ICE_SPIKE:42,
-  COBBLESTONE:43,IRON_BLOCK:44,GOLD_BLOCK:45,DIAMOND_BLOCK:46,DOOR:47,DOOR_OPEN:48};
+  COBBLESTONE:43,IRON_BLOCK:44,GOLD_BLOCK:45,DIAMOND_BLOCK:46,DOOR:47,DOOR_OPEN:48,
+  DOOR_TOP:49,DOOR_TOP_OPEN:50,
+  CRYSTAL:51,TERRACOTTA:52,BASALT:53,MUD:54,HAY_BALE:55,MOSSY_COBBLE:56};
 
 const BD={
   1:{n:'Cỏ',c:'#587030',t:'#7ED44D',h:0.8,d:'DIRT',s:true},
@@ -262,6 +264,12 @@ const BD={
   48:{n:'Cửa (Mở)',c:'#8A6030',h:2.0,d:'DOOR',s:false},
   49:{n:'Cửa (Trên)',c:'#8A6030',h:2.0,d:null,s:true},
   50:{n:'Cửa (Trên Mở)',c:'#8A6030',h:2.0,d:null,s:false},
+  51:{n:'Pha Lê',c:'#7A30B8',h:6.0,d:'CRYSTAL',s:true},
+  52:{n:'Đất Sét Nung',c:'#B84820',h:3.0,d:'TERRACOTTA',s:true},
+  53:{n:'Đá Núi Lửa',c:'#252530',h:4.5,d:'BASALT',s:true},
+  54:{n:'Bùn',c:'#3A2A1A',h:0.7,d:'MUD',s:true},
+  55:{n:'Kiện Rơm',c:'#C8A018',h:0.6,d:'HAY_BALE',s:true},
+  56:{n:'Đá Cuội Rêu',c:'#4A6040',h:3.0,d:'MOSSY_COBBLE',s:true},
 };
 
 const IT={
@@ -311,13 +319,19 @@ const IT={
   GOLD_BLOCK:{n:'Khối Vàng',block:45,c:'#FFD700'},
   DIAMOND_BLOCK:{n:'Khối Kim Cương',block:46,c:'#40E8E8'},
   DOOR:{n:'Cửa',block:47,c:'#8A6030'},
+  CRYSTAL:{n:'Pha Lê',block:51,c:'#B060E8'},
+  TERRACOTTA:{n:'Đất Sét Nung',block:52,c:'#C05020'},
+  BASALT:{n:'Đá Núi Lửa',block:53,c:'#303040'},
+  MUD:{n:'Bùn',block:54,c:'#3A2A1A'},
+  HAY_BALE:{n:'Kiện Rơm',block:55,c:'#C8A018'},
+  MOSSY_COBBLE:{n:'Đá Cuội Rêu',block:56,c:'#4A6040'},
 };
 
 const SMELT={
   IRON_ORE:{out:'IRON_INGOT',time:8000},GOLD_ORE:{out:'GOLD_INGOT',time:10000},
   COPPER_ORE:{out:'COPPER_INGOT',time:6000},SAND:{out:'GLASS',time:4000},
   STONE:{out:'MOSS_STONE',time:6000},MEAT:{out:'COOKED_MEAT',time:5000},
-  LOG:{out:'COAL',time:4000},CLAY:{out:'BRICK',time:5000},
+  LOG:{out:'COAL',time:4000},CLAY:{out:'TERRACOTTA',time:5000},
 };
 
 const RECIPES=[
@@ -355,6 +369,10 @@ const RECIPES=[
   {p:[['GOLD_INGOT','GOLD_INGOT','GOLD_INGOT'],['GOLD_INGOT','GOLD_INGOT','GOLD_INGOT'],['GOLD_INGOT','GOLD_INGOT','GOLD_INGOT']],o:'GOLD_BLOCK',cnt:1},
   {p:[['DIAMOND','DIAMOND','DIAMOND'],['DIAMOND','DIAMOND','DIAMOND'],['DIAMOND','DIAMOND','DIAMOND']],o:'DIAMOND_BLOCK',cnt:1},
   {p:[[null,'PLANK','PLANK'],[null,'PLANK','PLANK'],[null,'PLANK','PLANK']],o:'DOOR',cnt:1},
+  {p:[[null,null,null],[null,'COBBLESTONE',null],[null,'MOSS_STONE',null]],o:'MOSSY_COBBLE',cnt:2},
+  {p:[['SAND','SAND','SAND'],['SAND','SAND','SAND'],['SAND','SAND','SAND']],o:'HAY_BALE',cnt:1},
+  {p:[['CLAY','CLAY','CLAY'],['CLAY','CLAY','CLAY'],['CLAY','CLAY','CLAY']],o:'TERRACOTTA',cnt:6},
+  {p:[[null,null,null],['COBBLESTONE','COBBLESTONE',null],[null,null,null]],o:'BASALT',cnt:2},
 ];
 
 
@@ -377,7 +395,16 @@ function sndClick(){tone(500,0.03,'square',0.03,300);}
 function sndExplosion(){tone(60,0.5,'sawtooth',0.15,20);noiseSnd(0.4,0.12);}
 function sndLevelUp(){tone(500,0.1,'sine',0.08,800);setTimeout(()=>tone(700,0.1,'sine',0.06,1000),100);setTimeout(()=>tone(900,0.15,'sine',0.05,1200),200);}
 function sndPickup(){tone(900,0.05,'sine',0.04,1100);setTimeout(()=>tone(1100,0.06,'sine',0.03,1300),50);}
-function triggerClickSwing(){clickArmSide=Math.random()<0.5?-1:1;clickArmKick=1;}
+function sndSwordSlash(){tone(280,0.06,'sawtooth',0.09,80);tone(180,0.12,'sawtooth',0.06,40);noiseSnd(0.07,0.05);}
+function triggerClickSwing(){clickArmSide=Math.random()<0.5?-1:1;clickArmKick=1;
+  // Trigger sword slash visual if holding a sword
+  const held=getHeld();
+  if(held&&held.tool==='sword'){
+    swordSlash.active=true;swordSlash.timer=swordSlash.maxTimer;
+    swordSlash.dir=player.facing;swordSlash.x=player.x+player.w/2;swordSlash.y=player.y+player.h/3;
+    swordSlash.trail=[];sndSwordSlash();
+  }
+}
 
 
 // ── SKIN DATA ─────────────────────────────────────────────────────────────
@@ -409,13 +436,16 @@ let playerName = localStorage.getItem('ps_name') || 'Steve';
 
 // ── FULLSCREEN SCALE ─────────────────────────────────────────────────────
 function updateGameScale(){
-  const s = Math.min(window.innerWidth / W, window.innerHeight / H);
+  const vw = (window.visualViewport ? window.visualViewport.width  : window.innerWidth)  || window.innerWidth;
+  const vh = (window.visualViewport ? window.visualViewport.height : window.innerHeight) || window.innerHeight;
+  const s = Math.min(vw / W, vh / H);
   const el = document.getElementById('wrap');
   el.style.width  = W + 'px';
   el.style.height = H + 'px';
   el.style.transform = 'scale(' + s + ')';
-  el.style.left = ((window.innerWidth  - W * s) / 2) + 'px';
-  el.style.top  = ((window.innerHeight - H * s) / 2) + 'px';
+  el.style.left = Math.round((vw  - W * s) / 2) + 'px';
+  el.style.top  = Math.round((vh - H * s) / 2) + 'px';
 }
 window.addEventListener('resize', updateGameScale);
+if(window.visualViewport) window.visualViewport.addEventListener('resize', updateGameScale);
 updateGameScale();
